@@ -1,5 +1,5 @@
 /* App.css - Estilos principales para TwoLifeCar */
-
+@import "tailwindcss";
 /* Variables CSS para colores de autos */
 :root {
   /* Colores principales - inspirados en la industria automotriz */

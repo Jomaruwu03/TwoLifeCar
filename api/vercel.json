@@ -14,6 +14,8 @@
   ],
   "env": {
     "MONGODB_URI": "@mongodb_uri",
-    "JWT_SECRET": "@jwt_secret"
+    "JWT_SECRET": "@jwt_secret",
+    "SLACK_WEBHOOK_URL":"@slack_webhook_url",
+    "RECAPTCHA_SECRET_KEY": "@recaptcha_secret_key"
   }
 }
