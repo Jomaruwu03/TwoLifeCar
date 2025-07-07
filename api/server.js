@@ -21,17 +21,6 @@ app.get("/", (req, res) => {
   });
 });
 
-// Ruta para /api
-app.get("/api", (req, res) => {
-  res.json({ 
-    message: "API Endpoints",
-    endpoints: {
-      leads: "/api/leads",
-      health: "/api/health"
-    }
-  });
-});
-
 // Health check
 app.get("/api/health", (req, res) => {
   res.json({ 
