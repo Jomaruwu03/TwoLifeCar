@@ -8,6 +8,58 @@ app.use(cors());
 app.use(express.json());
 
 connectDB();
+
+// Ruta principal
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "TwoLifeCar API funcionando correctamente",
+    version: "1.0.0",
+    endpoints: {
+      leads: "/api/leads",
+      health: "/api/health"
+    }
+  });
+});
+
+// Ruta para /api
+app.get("/api", (req, res) => {
+  res.json({ 
+    message: "API Endpoints",
+    endpoints: {
+      leads: "/api/leads",
+      health: "/api/health"
+    }
+  });
+});
+
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    database: "Connected" // Puedes agregar estado de DB aquí
+  });
+});
+
+// Tus rutas existentes
 app.use("/api", require("./routes/leadRoutes"));
 
-app.listen(process.env.PORT, () => console.log(`🚀 API en http://localhost:${process.env.PORT}`));
+// Manejo de errores 404
+app.use("*", (req, res) => {
+  res.status(404).json({
+    error: "Ruta no encontrada",
+    path: req.originalUrl,
+    availableEndpoints: [
+      "GET /",
+      "GET /api",
+      "GET /api/health",
+      "GET /api/leads" // Ajusta según tus rutas
+    ]
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 API en http://localhost:${PORT}`));
+
+// Exportar para Vercel
+module.exports = app;
