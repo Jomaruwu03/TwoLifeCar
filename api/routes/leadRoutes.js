@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createLead, getLeads } = require("../controllers/leadController");
+const { createLead, getLeads,deleteLead,replyLead } = require("../controllers/leadController");
 
 router.post("/leads", createLead);
 router.get("/leads", getLeads);
