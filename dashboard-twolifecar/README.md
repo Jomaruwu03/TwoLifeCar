@@ -1,4 +1,8 @@
-# React + Vite
+# TwoLifeCar Dashboard
+
+Dashboard para el sistema TwoLifeCar construido con React + Vite.
+
+## Configuración
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
