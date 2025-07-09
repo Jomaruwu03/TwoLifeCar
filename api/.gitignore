@@ -15,6 +15,13 @@ dist-ssr
 .env.local
 .env.production
 .env.development
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+test-api.js
+coverage/
 
 # Editor directories and files
 .vscode/*

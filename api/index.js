@@ -71,8 +71,8 @@ app.use("*", (req, res) => {
 // Configurar el puerto
 const PORT = process.env.PORT || 5000;
 
-// Solo iniciar el servidor si no estamos en Vercel
-if (!process.env.VERCEL) {
+// Solo iniciar el servidor si no estamos en Vercel y no está siendo importado
+if (!process.env.VERCEL && require.main === module) {
   app.listen(PORT, () => {
     console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
   });
