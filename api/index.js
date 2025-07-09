@@ -10,15 +10,21 @@ const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
         'https://twolifecar-landing.vercel.app',
-        'https://twolifecar-dashboard.vercel.app'
+        'https://twolifecar-dashboard.vercel.app',
+        'https://twolifecar-api.vercel.app'
       ]
-    : ['http://localhost:5173', 'http://localhost:5174'],
+    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3001'],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Middleware para manejar preflight requests
+app.options('*', cors(corsOptions));
 
 // Middleware para manejo de errores
 app.use((err, req, res, next) => {
