@@ -43,7 +43,7 @@ exports.getLeads = async (req, res) => {
     console.error("Error getting leads:", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
-}; // ✅ Faltaba esta llave de cierre
+};
 
 exports.deleteLead = async (req, res) => {
   try {
@@ -53,7 +53,7 @@ exports.deleteLead = async (req, res) => {
     console.error("Error deleting lead:", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
-}; // ✅ Faltaba esta llave de cierre y estaba mal ubicada
+};
 
 exports.replyLead = async (req, res) => {
   try {
@@ -63,4 +63,4 @@ exports.replyLead = async (req, res) => {
     console.error("Error replying lead:", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
-}; // ✅ Faltaba esta llave de cierre
+};

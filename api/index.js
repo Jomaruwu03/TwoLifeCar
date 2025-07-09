@@ -20,7 +20,14 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-connectDB();
+// Middleware para manejo de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Error interno del servidor" });
+});
+
+// Conectar a MongoDB (sin bloquear la aplicación)
+connectDB().catch(console.error);
 
 // Ruta principal
 app.get("/", (req, res) => {
