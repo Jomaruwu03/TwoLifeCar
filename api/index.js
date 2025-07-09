@@ -11,7 +11,7 @@ const corsOptions = {
     ? [
         'https://twolifecar-landing.vercel.app',
         'https://twolifecar-dashboard.vercel.app',
-        'https://twolifecar-api.vercel.app'
+        'https://twolifecar-api-psi.vercel.app'
       ]
     : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3001'],
   credentials: true,
@@ -35,6 +35,31 @@ app.use((err, req, res, next) => {
 // Conectar a MongoDB (sin bloquear la aplicación)
 connectDB().catch(console.error);
 
+// Crear usuario admin por defecto si no existe
+const createDefaultAdmin = async () => {
+  try {
+    const User = require("./models/User");
+    const existingAdmin = await User.findOne({ username: "admin" });
+    
+    if (!existingAdmin) {
+      const adminUser = new User({
+        username: "admin",
+        password: "123456" // Será hasheado automáticamente por el pre-save hook
+      });
+      await adminUser.save();
+      console.log("✅ Usuario admin creado automáticamente");
+      console.log("📋 Credenciales: admin / 123456");
+    } else {
+      console.log("✅ Usuario admin ya existe");
+    }
+  } catch (error) {
+    console.error("❌ Error creando usuario admin:", error);
+  }
+};
+
+// Crear admin después de conectar a la DB
+setTimeout(createDefaultAdmin, 2000);
+
 // Ruta principal
 app.get("/", (req, res) => {
   res.json({ 
@@ -42,7 +67,14 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       leads: "/api/leads",
-      health: "/api/health"
+      health: "/api/health",
+      login: "/api/login",
+      createAdmin: "/api/create-admin"
+    },
+    adminCredentials: {
+      username: "admin",
+      password: "123456",
+      note: "Usuario admin se crea automáticamente al iniciar"
     }
   });
 });
@@ -67,9 +99,11 @@ app.use("*", (req, res) => {
     path: req.originalUrl,
     availableEndpoints: [
       "GET /",
-      "GET /api",
       "GET /api/health",
-      "GET /api/leads" // Ajusta según tus rutas
+      "GET /api/create-admin",
+      "POST /api/login",
+      "GET /api/leads",
+      "POST /api/leads"
     ]
   });
 });
