@@ -78,3 +78,129 @@ footer {
   border-radius: 12px;
   margin-bottom: 20px;
 }
+
+/* Términos y condiciones */
+.terms-container {
+  margin: 20px 0;
+}
+
+.terms-label {
+  display: flex;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.terms-label input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.terms-link {
+  background: none;
+  border: none;
+  color: #3182ce;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+.terms-link:hover {
+  color: #2b6cb0;
+  background: none;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #2d3748;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+  line-height: 1.6;
+}
+
+.modal-body h3 {
+  color: #2d3748;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.modal-body p {
+  margin-bottom: 15px;
+  text-align: justify;
+}
+
+.last-updated {
+  font-style: italic;
+  color: #666;
+  margin-top: 20px;
+}
+
+/* Botón deshabilitado */
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background: #ccc;
+}

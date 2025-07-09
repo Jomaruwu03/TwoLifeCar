@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "twolifecar-dashboard",
+  "builds": [
+    {
+      "src": "dashboard-twolifecar/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dashboard-twolifecar/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/dashboard-twolifecar/dist/$1"
+    }
+  ]
+}

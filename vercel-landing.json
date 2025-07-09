@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "twolifecar-landing",
+  "builds": [
+    {
+      "src": "landing-twolifecar/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "landing-twolifecar/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/landing-twolifecar/dist/$1"
+    }
+  ]
+}

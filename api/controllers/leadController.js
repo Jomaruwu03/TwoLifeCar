@@ -2,9 +2,13 @@ const axios = require("axios");
 const Lead = require("../models/Lead");
 
 exports.createLead = async (req, res) => {
-  const { name, email, message, token } = req.body;
+  const { name, email, message, token, acceptedTerms } = req.body;
 
   if (!token) return res.status(400).json({ message: "reCAPTCHA token missing" });
+  
+  if (!acceptedTerms) {
+    return res.status(400).json({ message: "Debe aceptar los términos y condiciones" });
+  }
 
   try {
     // Validar reCAPTCHA
@@ -17,7 +21,7 @@ exports.createLead = async (req, res) => {
 
     if (!verify.data.success) return res.status(400).json({ message: "reCAPTCHA failed" });
 
-    const newLead = new Lead({ name, email, message });
+    const newLead = new Lead({ name, email, message, acceptedTerms });
     await newLead.save();
 
     await axios.post(process.env.SLACK_WEBHOOK_URL, {

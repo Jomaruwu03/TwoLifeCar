@@ -4,7 +4,20 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 
 const app = express();
-app.use(cors());
+
+// Configurar CORS
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? [
+        'https://twolifecar-landing.vercel.app',
+        'https://twolifecar-dashboard.vercel.app'
+      ]
+    : ['http://localhost:5173', 'http://localhost:5174'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 connectDB();
@@ -31,6 +44,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // Tus rutas existentes
+app.use("/api", require("./routes/authRoutes"));
 app.use("/api", require("./routes/leadRoutes"));
 
 // Manejo de errores 404
@@ -47,6 +61,15 @@ app.use("*", (req, res) => {
   });
 });
 
+// Configurar el puerto
+const PORT = process.env.PORT || 5000;
+
+// Solo iniciar el servidor si no estamos en Vercel
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
+  });
+}
 
 // Exportar para Vercel
 module.exports = app;
