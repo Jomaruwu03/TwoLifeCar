@@ -57,6 +57,7 @@ function App() {
           placeholder="Nombre"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
+          autoComplete="name"
           required
         />
         <input
@@ -64,6 +65,7 @@ function App() {
           placeholder="Correo electrónico"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
+          autoComplete="email"
           required
         />
         <textarea
