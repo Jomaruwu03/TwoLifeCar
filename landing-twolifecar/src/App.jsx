@@ -25,7 +25,7 @@ function App() {
     }
 
     try {
-      const res = await axios.post(`${API_URL}/leads`, {
+      const res = await axios.post(`${API_URL}`, {
         ...form,
         token,
         acceptedTerms: true,
