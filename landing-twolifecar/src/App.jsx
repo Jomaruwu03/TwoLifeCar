@@ -45,7 +45,7 @@ function App() {
   return (
     <div className="container">
       <img
-        src="https://images.unsplash.com/photo-1549921296-3a6b81c92410?auto=format&fit=crop&w=1350&q=80"
+        src="twolifecar/landing-twolifecar/src/assets/tsuru_tuneado.png"
         alt="Venta de autos usados"
         className="hero-image"
       />
