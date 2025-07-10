@@ -2,7 +2,11 @@
 
 Dashboard para el sistema TwoLifeCar construido con React + Vite.
 
-## Configuración
+## Configuración API
+
+La API está configurada en: `https://twolifecar-api-psi.vercel.app/api`
+
+## Desarrollo
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
