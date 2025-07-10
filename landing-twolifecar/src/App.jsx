@@ -3,7 +3,7 @@ import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
 import "./App.css";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = 'https://twolifecar-api-psi.vercel.app/api/leads';
 
 function App() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -25,7 +25,7 @@ function App() {
     }
 
     try {
-      const res = await axios.post(`${API_URL}/leads`, {
+      const res = await axios.post(`${API_URL}`, {
         ...form,
         token,
         acceptedTerms: true,
