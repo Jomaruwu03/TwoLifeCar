@@ -3,9 +3,10 @@ import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
 import "./App.css";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://twolifecar-api-psi.vercel.app/api";
 
 console.log("🔍 Landing API URL:", API_URL);
+console.log("🔍 Variables de entorno:", import.meta.env);
 
 function App() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
