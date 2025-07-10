@@ -102,8 +102,23 @@ function Login() {
       <div className="bg-white p-8 rounded-lg shadow w-full max-w-md">
         <h1 className="text-2xl font-bold mb-4">TwoLifeCar</h1>
         <form onSubmit={handleLogin} className="space-y-4">
-          <input value={user.username} onChange={(e) => setUser({ ...user, username: e.target.value })} placeholder="Usuario" className="w-full border px-3 py-2 rounded" />
-          <input type="password" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} placeholder="Contraseña" className="w-full border px-3 py-2 rounded" />
+          <input 
+            value={user.username} 
+            onChange={(e) => setUser({ ...user, username: e.target.value })} 
+            placeholder="Usuario" 
+            className="w-full border px-3 py-2 rounded" 
+            autoComplete="username"
+            required
+          />
+          <input 
+            type="password" 
+            value={user.password} 
+            onChange={(e) => setUser({ ...user, password: e.target.value })} 
+            placeholder="Contraseña" 
+            className="w-full border px-3 py-2 rounded" 
+            autoComplete="current-password"
+            required
+          />
           <button type="submit" disabled={loading} className="w-full bg-blue-500 text-white py-2 rounded">{loading ? "Cargando..." : "Iniciar sesión"}</button>
         </form>
         <p className="text-sm text-gray-500 mt-4">Usuario: admin | Contraseña: 123456</p>

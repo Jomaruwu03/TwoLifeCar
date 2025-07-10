@@ -5,7 +5,7 @@ const connectDB = require("./config/db");
 
 const app = express();
 
-// Configurar CORS
+
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
