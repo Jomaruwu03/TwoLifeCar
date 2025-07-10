@@ -81,11 +81,54 @@ app.get("/", (req, res) => {
 
 // Health check
 app.get("/api/health", (req, res) => {
+  const mongoose = require("mongoose");
   res.json({ 
     status: "OK",
     timestamp: new Date().toISOString(),
-    database: "Connected" // Puedes agregar estado de DB aquí
+    mongodb: {
+      connected: mongoose.connection.readyState === 1,
+      state: mongoose.connection.readyState,
+      host: mongoose.connection.host
+    },
+    environment: {
+      nodeEnv: process.env.NODE_ENV,
+      hasRecaptcha: !!process.env.RECAPTCHA_SECRET_KEY,
+      hasSlack: !!process.env.SLACK_WEBHOOK_URL,
+      hasMongoUri: !!process.env.MONGODB_URI
+    }
   });
+});
+
+// Test endpoint para probar la creación de leads
+app.post("/api/test-lead", async (req, res) => {
+  try {
+    const Lead = require("./models/Lead");
+    const mongoose = require("mongoose");
+    
+    console.log("🧪 Test endpoint - Estado MongoDB:", mongoose.connection.readyState);
+    
+    const testLead = new Lead({
+      name: "Test User",
+      email: "test@example.com",
+      message: "Este es un test",
+      acceptedTerms: true
+    });
+    
+    await testLead.save();
+    
+    res.json({ 
+      message: "Test lead creado exitosamente",
+      id: testLead._id,
+      mongoState: mongoose.connection.readyState
+    });
+  } catch (error) {
+    console.error("❌ Error en test-lead:", error);
+    res.status(500).json({ 
+      message: "Error en test",
+      error: error.message,
+      stack: error.stack
+    });
+  }
 });
 
 // Tus rutas existentes
@@ -100,6 +143,7 @@ app.use("*", (req, res) => {
     availableEndpoints: [
       "GET /",
       "GET /api/health",
+      "POST /api/test-lead",
       "GET /api/create-admin",
       "POST /api/login",
       "GET /api/leads",

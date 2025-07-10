@@ -8,14 +8,25 @@ exports.createLead = async (req, res) => {
 
   // Validar campos requeridos
   if (!name || !email || !message) {
+    console.error("❌ Validación fallida: campos requeridos faltantes");
     return res.status(400).json({ message: "Nombre, email y mensaje son requeridos" });
   }
 
   if (!acceptedTerms) {
+    console.error("❌ Validación fallida: términos no aceptados");
     return res.status(400).json({ message: "Debe aceptar los términos y condiciones" });
   }
 
   try {
+    // Verificar conexión a MongoDB
+    const mongoose = require("mongoose");
+    console.log("🔍 Estado de conexión MongoDB:", mongoose.connection.readyState);
+    
+    if (mongoose.connection.readyState !== 1) {
+      console.error("❌ MongoDB no está conectado");
+      return res.status(500).json({ message: "Base de datos no disponible" });
+    }
+
     // Validar reCAPTCHA solo si está configurado
     if (process.env.RECAPTCHA_SECRET_KEY && token) {
       console.log("🔍 Validando reCAPTCHA...");
@@ -29,6 +40,7 @@ exports.createLead = async (req, res) => {
       console.log("🔍 Resultado reCAPTCHA:", verify.data);
 
       if (!verify.data.success) {
+        console.error("❌ reCAPTCHA falló:", verify.data);
         return res.status(400).json({ message: "reCAPTCHA failed" });
       }
     } else {
@@ -37,8 +49,11 @@ exports.createLead = async (req, res) => {
 
     console.log("💾 Guardando lead en MongoDB...");
     const newLead = new Lead({ name, email, message, acceptedTerms });
+    
+    console.log("🔍 Lead creado en memoria:", newLead);
+    
     await newLead.save();
-    console.log("✅ Lead guardado exitosamente");
+    console.log("✅ Lead guardado exitosamente con ID:", newLead._id);
 
     // Enviar notificación a Slack solo si está configurado
     if (process.env.SLACK_WEBHOOK_URL) {
