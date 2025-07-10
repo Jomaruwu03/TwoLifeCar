@@ -4,10 +4,9 @@ import axios from "axios";
 import "./App.css";
 import { X, Send, Archive, LogOut, User, Mail, Calendar, MessageSquare } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://twolifecar-api-psi.vercel.app/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 console.log("🔍 Dashboard API URL:", API_URL);
-console.log("🔍 Variables de entorno:", import.meta.env);
 
 // --------- COMPONENTES MODAL ---------
 
@@ -84,12 +83,8 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     
-    const loginUrl = `${API_URL}/login`;
-    console.log("🔍 Intentando login en:", loginUrl);
-    console.log("🔍 API_URL base:", API_URL);
-    
     try {
-      const response = await axios.post(loginUrl, {
+      const response = await axios.post(`${API_URL}/login`, {
         username: user.username,
         password: user.password
       });
