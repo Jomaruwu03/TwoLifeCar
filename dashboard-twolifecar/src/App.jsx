@@ -6,6 +6,8 @@ import { X, Send, Archive, LogOut, User, Mail, Calendar, MessageSquare } from "l
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
+console.log("🔍 Dashboard API URL:", API_URL);
+
 // --------- COMPONENTES MODAL ---------
 
 function Modal({ isOpen, onClose, title, children }) {

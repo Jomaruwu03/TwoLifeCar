@@ -3,7 +3,9 @@ import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
 import "./App.css";
 
-const API_URL = 'https://twolifecar-api-psi.vercel.app/api/leads';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+console.log("🔍 Landing API URL:", API_URL);
 
 function App() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
