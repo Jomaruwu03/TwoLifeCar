@@ -175,6 +175,28 @@ app.use("*", (req, res) => {
   });
 });
 
+// Verificar estado de la base de datos periódicamente
+setInterval(async () => {
+  const mongoose = require("mongoose");
+  const dbState = mongoose.connection.readyState;
+
+  console.log("🔍 Estado actual de MongoDB:", {
+    connected: dbState === 1,
+    state: dbState,
+    host: mongoose.connection.host || "Desconocido"
+  });
+
+  if (dbState !== 1) {
+    console.error("❌ MongoDB no está conectado. Intentando reconectar...");
+    try {
+      await connectDB();
+      console.log("✅ Reconexión a MongoDB exitosa");
+    } catch (reconnectError) {
+      console.error("❌ Error al intentar reconectar a MongoDB:", reconnectError);
+    }
+  }
+}, 60000); // Verificar cada 60 segundos
+
 // Configurar el puerto
 const PORT = process.env.PORT || 5000;
 
