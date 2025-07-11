@@ -135,6 +135,9 @@ app.post("/api/test-lead", async (req, res) => {
 app.use("/api", require("./routes/authRoutes"));
 app.use("/api", require("./routes/leadRoutes"));
 
+// Add a route to ignore favicon requests
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Manejo de errores 404
 app.use("*", (req, res) => {
   res.status(404).json({
