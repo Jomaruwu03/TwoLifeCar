@@ -1,6 +1,6 @@
 const axios = require("axios");
 const Lead = require("../models/Lead");
-const nodemailer = require("nodemailer");
+const emailjs = require("emailjs-com");
 
 exports.createLead = async (req, res) => {
   const { name, email, message, token, acceptedTerms } = req.body;
@@ -72,34 +72,23 @@ exports.createLead = async (req, res) => {
       console.log("⚠️ Slack webhook no configurado");
     }
 
-    // Enviar correo al usuario
+    // Enviar correo al usuario con EmailJS
     if (email) {
-      console.log("📧 Enviando correo de confirmación al usuario...");
+      console.log("📧 Enviando correo de confirmación al usuario con EmailJS...");
 
-      const transporter = nodemailer.createTransport({
-        service: "gmail", // Cambiar según el proveedor de correo
-        auth: {
-          user: process.env.EMAIL_USER, // Configurar en .env
-          pass: process.env.EMAIL_PASS, // Configurar en .env
-        },
-      });
-
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Gracias por tu interés en TwoLifeCar",
-        text: `Hola ${name},
-
-Gracias por contactarnos. Hemos recibido tu mensaje y te responderemos pronto.
-
-Mensaje recibido:
-${message}
-
-Saludos,
-El equipo de TwoLifeCar`,
+      const templateParams = {
+        user_name: name,
+        user_email: email,
+        message: `Hola ${name}, gracias por contactarnos. Hemos recibido tu mensaje y te responderemos pronto.\n\nMensaje recibido:\n${message}`,
       };
 
-      await transporter.sendMail(mailOptions);
+      await emailjs.send(
+        process.env.EMAILJS_SERVICE_ID, // ID del servicio configurado en EmailJS
+        process.env.EMAILJS_TEMPLATE_ID, // ID de la plantilla configurada en EmailJS
+        templateParams,
+        process.env.EMAILJS_USER_ID // ID del usuario de EmailJS
+      );
+
       console.log("✅ Correo enviado exitosamente a:", email);
     }
 

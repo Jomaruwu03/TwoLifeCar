@@ -59,16 +59,28 @@ function ReplyModal({ isOpen, onClose, leadEmail, leadName }) {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!subject.trim() || !message.trim()) {
       alert("Completa todos los campos");
       return;
     }
-    alert(`Email enviado a ${leadEmail}`);
-    onClose();
-    setSubject("");
-    setMessage("");
+
+    try {
+      const response = await axios.post(`${API_URL}/leads/reply`, {
+        email: leadEmail,
+        subject,
+        message,
+      });
+
+      alert(response.data.message);
+      onClose();
+      setSubject("");
+      setMessage("");
+    } catch (error) {
+      console.error("Error enviando respuesta:", error);
+      alert("Error al enviar la respuesta. Inténtalo de nuevo.");
+    }
   };
 
   return (
