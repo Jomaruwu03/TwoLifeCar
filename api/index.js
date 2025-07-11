@@ -32,6 +32,16 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Error interno del servidor" });
 });
 
+// Middleware global para capturar errores no manejados
+app.use((err, req, res, next) => {
+  console.error("❌ Error no manejado:", err.message);
+  console.error("Detalles del error:", err.stack);
+  res.status(500).json({
+    message: "Error interno del servidor",
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+
 // Conectar a MongoDB (sin bloquear la aplicación)
 connectDB().catch(console.error);
 
@@ -137,6 +147,16 @@ app.use("/api", require("./routes/leadRoutes"));
 
 // Add a route to ignore favicon requests
 app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+// Middleware para verificar la clave privada de la API
+app.use((req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (apiKey !== process.env.PRIVATE_API_KEY) {
+    console.error("❌ Clave API inválida o faltante");
+    return res.status(403).json({ message: "Acceso denegado: clave API inválida" });
+  }
+  next();
+});
 
 // Manejo de errores 404
 app.use("*", (req, res) => {

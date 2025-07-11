@@ -82,14 +82,21 @@ exports.createLead = async (req, res) => {
         message: `Hola ${name}, gracias por contactarnos. Hemos recibido tu mensaje y te responderemos pronto.\n\nMensaje recibido:\n${message}`,
       };
 
-      await emailjs.send(
-        process.env.EMAILJS_SERVICE_ID, // ID del servicio configurado en EmailJS
-        process.env.EMAILJS_TEMPLATE_ID, // ID de la plantilla configurada en EmailJS
-        templateParams,
-        process.env.EMAILJS_USER_ID // ID del usuario de EmailJS
-      );
+      console.log("📧 Parámetros de la plantilla de EmailJS:", templateParams);
 
-      console.log("✅ Correo enviado exitosamente a:", email);
+      try {
+        await emailjs.send(
+          process.env.EMAILJS_SERVICE_ID, // ID del servicio configurado en EmailJS
+          process.env.EMAILJS_TEMPLATE_ID, // ID de la plantilla configurada en EmailJS
+          templateParams,
+          process.env.EMAILJS_USER_ID // ID del usuario de EmailJS
+        );
+
+        console.log("✅ Correo enviado exitosamente a:", email);
+      } catch (emailError) {
+        console.error("❌ Error enviando correo con EmailJS:", emailError.message);
+        console.error("Detalles del error:", emailError);
+      }
     }
 
     res.status(201).json({ message: "Lead recibido exitosamente" });
