@@ -73,13 +73,24 @@ setTimeout(createDefaultAdmin, 2000);
 // Ruta principal
 app.get("/", (req, res) => {
   res.json({ 
-    message: "TwoLifeCar API funcionando correctamente",
+    message: "🚗 TwoLifeCar API funcionando correctamente",
     version: "1.0.0",
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    services: {
+      discord: !!process.env.DISCORD_WEBHOOK_URL ? "configured" : "not configured",
+      slack: !!process.env.SLACK_WEBHOOK_URL ? "configured" : "not configured",
+      mongodb: "connected",
+      recaptcha: !!process.env.RECAPTCHA_SECRET_KEY ? "configured" : "not configured"
+    },
     endpoints: {
       leads: "/api/leads",
       health: "/api/health",
       login: "/api/login",
-      createAdmin: "/api/create-admin"
+      createAdmin: "/api/create-admin",
+      discord_status: "/api/discord/status",
+      discord_test: "/api/discord/test"
     },
     adminCredentials: {
       username: "admin",
@@ -144,6 +155,7 @@ app.post("/api/test-lead", async (req, res) => {
 // Tus rutas existentes
 app.use("/api", require("./routes/authRoutes"));
 app.use("/api", require("./routes/leadRoutes"));
+app.use("/api/discord", require("./routes/discordRoutes"));
 
 // Add a route to ignore favicon requests
 app.get('/favicon.ico', (req, res) => res.status(204).end());
