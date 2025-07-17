@@ -73,19 +73,22 @@ exports.createLead = async (req, res) => {
       console.log("⚠️ Slack webhook no configurado");
     }
 
-    // Enviar notificación a Discord solo si está configurado
+    // Enviar notificación a Discord - SIEMPRE intentar
+    console.log("📢 Preparando notificación a Discord...");
     if (process.env.DISCORD_WEBHOOK_URL) {
       try {
         console.log("📢 Enviando notificación a Discord...");
         const discordService = new DiscordService(process.env.DISCORD_WEBHOOK_URL);
         await discordService.sendLeadNotification({ name, email, message });
-        console.log("✅ Notificación enviada a Discord");
+        console.log("✅ Notificación enviada a Discord exitosamente");
       } catch (discordError) {
         console.error("⚠️ Error enviando a Discord:", discordError.message);
-        // No fallar si Discord falla
+        console.error("Discord Error Details:", discordError);
+        // No fallar si Discord falla, pero loggear claramente
       }
     } else {
-      console.log("⚠️ Discord webhook no configurado");
+      console.log("⚠️ Discord webhook no configurado - Lead creado pero sin notificación Discord");
+      console.log("🔧 Para activar Discord, configura DISCORD_WEBHOOK_URL en las variables de entorno");
     }
 
     // Enviar correo al usuario con EmailJS

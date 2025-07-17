@@ -51,3 +51,25 @@ exports.sendCustomMessage = async (req, res) => {
     });
   }
 };
+
+exports.getDiscordStatus = async (req, res) => {
+  try {
+    const isConfigured = !!process.env.DISCORD_WEBHOOK_URL;
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL ? 
+      `${process.env.DISCORD_WEBHOOK_URL.substring(0, 50)}...` : 
+      'Not configured';
+    
+    res.json({
+      status: "Discord service is running",
+      configured: isConfigured,
+      webhookUrl: webhookUrl,
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: "Error checking Discord service",
+      error: error.message 
+    });
+  }
+};
