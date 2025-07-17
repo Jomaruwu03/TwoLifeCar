@@ -1,6 +1,7 @@
 const axios = require("axios");
 const Lead = require("../models/Lead");
 const emailjs = require("emailjs-com");
+const DiscordService = require("../services/discordService");
 
 exports.createLead = async (req, res) => {
   const { name, email, message, token, acceptedTerms } = req.body;
@@ -70,6 +71,21 @@ exports.createLead = async (req, res) => {
       }
     } else {
       console.log("⚠️ Slack webhook no configurado");
+    }
+
+    // Enviar notificación a Discord solo si está configurado
+    if (process.env.DISCORD_WEBHOOK_URL) {
+      try {
+        console.log("📢 Enviando notificación a Discord...");
+        const discordService = new DiscordService(process.env.DISCORD_WEBHOOK_URL);
+        await discordService.sendLeadNotification({ name, email, message });
+        console.log("✅ Notificación enviada a Discord");
+      } catch (discordError) {
+        console.error("⚠️ Error enviando a Discord:", discordError.message);
+        // No fallar si Discord falla
+      }
+    } else {
+      console.log("⚠️ Discord webhook no configurado");
     }
 
     // Enviar correo al usuario con EmailJS
