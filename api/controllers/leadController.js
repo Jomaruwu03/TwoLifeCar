@@ -52,81 +52,99 @@ exports.createLead = async (req, res) => {
       return res.status(500).json({ message: "Base de datos no disponible" });
     }
 
-    // Validar reCAPTCHA Enterprise (nuevo sistema)
-    if (process.env.GOOGLE_CLOUD_PROJECT_ID && token) {
-      console.log("🛡️ Validando reCAPTCHA Enterprise...");
-      
-      const recaptchaResult = await recaptchaService.validateToken(token);
-      
-      if (!recaptchaResult.success) {
-        console.error("❌ reCAPTCHA Enterprise falló:", recaptchaResult);
-        recaptchaService.close(); // Cerrar conexión
-        return res.status(400).json({ 
-          message: "Verificación de seguridad fallida", 
-          details: recaptchaResult.message,
-          score: recaptchaResult.score 
-        });
-      }
-      
-      console.log("✅ reCAPTCHA Enterprise validado exitosamente. Puntuación:", recaptchaResult.score);
-      
-    } else if (process.env.RECAPTCHA_SECRET_KEY && token) {
-      // Fallback al sistema legacy de reCAPTCHA v2
-      console.log("🔍 Validando reCAPTCHA legacy...");
-      console.log("🔍 Secret Key presente:", !!process.env.RECAPTCHA_SECRET_KEY);
-      console.log("🔍 Token recibido:", token.substring(0, 20) + "...");
-      
-      const verify = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
-        params: {
-          secret: process.env.RECAPTCHA_SECRET_KEY,
-          response: token,
-        },
-      });
-
-      console.log("🔍 Resultado completo reCAPTCHA legacy:", verify.data);
-
-      if (!verify.data.success) {
-        console.error("❌ reCAPTCHA legacy falló:", verify.data);
-        console.error("❌ Error codes:", verify.data['error-codes']);
-        recaptchaService.close(); // Cerrar conexión
+    // FORZAR reCAPTCHA v2 como prioritario - más estable que Enterprise
+    if (token) {
+      if (process.env.RECAPTCHA_SECRET_KEY) {
+        // Sistema reCAPTCHA v2 (prioritario siempre)
+        console.log("🔍 Usando reCAPTCHA v2 (forzado como prioritario)...");
+        console.log("🔍 Secret Key presente:", !!process.env.RECAPTCHA_SECRET_KEY);
+        console.log("🔍 Token recibido:", token.substring(0, 20) + "...");
         
-        // Proporcionar mensaje más específico basado en el error
-        let errorMessage = "Verificación de reCAPTCHA fallida";
-        if (verify.data['error-codes']) {
-          const errors = verify.data['error-codes'];
-          if (errors.includes('invalid-input-secret')) {
-            errorMessage = "Error de configuración del servidor";
-          } else if (errors.includes('invalid-input-response')) {
-            errorMessage = "Token de reCAPTCHA inválido";
-          } else if (errors.includes('bad-request')) {
-            errorMessage = "Solicitud de reCAPTCHA malformada";
-          } else if (errors.includes('timeout-or-duplicate')) {
-            errorMessage = "Token de reCAPTCHA expirado o ya usado";
+        try {
+          const verify = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
+            params: {
+              secret: process.env.RECAPTCHA_SECRET_KEY,
+              response: token,
+            },
+          });
+
+          console.log("🔍 Resultado completo reCAPTCHA v2:", verify.data);
+
+          if (!verify.data.success) {
+            console.error("❌ reCAPTCHA v2 falló:", verify.data);
+            console.error("❌ Error codes:", verify.data['error-codes']);
+            
+            // Proporcionar mensaje más específico basado en el error
+            let errorMessage = "Verificación de reCAPTCHA fallida";
+            if (verify.data['error-codes']) {
+              const errors = verify.data['error-codes'];
+              if (errors.includes('invalid-input-secret')) {
+                errorMessage = "Error de configuración del servidor";
+              } else if (errors.includes('invalid-input-response')) {
+                errorMessage = "Token de reCAPTCHA inválido";
+              } else if (errors.includes('bad-request')) {
+                errorMessage = "Solicitud de reCAPTCHA malformada";
+              } else if (errors.includes('timeout-or-duplicate')) {
+                errorMessage = "Token de reCAPTCHA expirado o ya usado";
+              }
+            }
+            
+            return res.status(400).json({ 
+              message: errorMessage,
+              details: verify.data['error-codes']?.join(', ') || "Error de verificación",
+              debug: process.env.NODE_ENV === 'development' ? verify.data : undefined
+            });
           }
+          
+          console.log("✅ reCAPTCHA v2 validado exitosamente");
+          
+        } catch (recaptchaError) {
+          console.error("❌ Error al validar reCAPTCHA v2:", recaptchaError.message);
+          return res.status(400).json({ 
+            message: "Error al validar reCAPTCHA",
+            details: "Error de conexión con el servicio de verificación"
+          });
         }
         
+      } else if (process.env.GOOGLE_CLOUD_PROJECT_ID) {
+        // Solo usar Enterprise si v2 no está disponible
+        console.log("🛡️ Fallback: Validando reCAPTCHA Enterprise...");
+        
+        try {
+          const recaptchaResult = await recaptchaService.validateToken(token);
+          
+          if (!recaptchaResult.success) {
+            console.error("❌ reCAPTCHA Enterprise falló:", recaptchaResult);
+            return res.status(400).json({ 
+              message: "Verificación de seguridad fallida", 
+              details: recaptchaResult.message,
+              score: recaptchaResult.score 
+            });
+          }
+          
+          console.log("✅ reCAPTCHA Enterprise validado exitosamente. Puntuación:", recaptchaResult.score);
+          
+        } catch (enterpriseError) {
+          console.error("❌ Error en reCAPTCHA Enterprise:", enterpriseError.message);
+          return res.status(400).json({ 
+            message: "Error al validar reCAPTCHA Enterprise",
+            details: "Error interno del servicio de verificación"
+          });
+        }
+      } else {
+        console.log("⚠️ Ningún sistema reCAPTCHA configurado");
         return res.status(400).json({ 
-          message: errorMessage,
-          details: verify.data['error-codes']?.join(', ') || "Error de verificación",
-          debug: process.env.NODE_ENV === 'development' ? verify.data : undefined
+          message: "Sistema de verificación no configurado",
+          details: "reCAPTCHA no está disponible"
         });
       }
-      
-      console.log("✅ reCAPTCHA legacy validado exitosamente");
       
     } else {
-      console.log("⚠️ reCAPTCHA no configurado o token faltante");
-      console.log("⚠️ GOOGLE_CLOUD_PROJECT_ID:", !!process.env.GOOGLE_CLOUD_PROJECT_ID);
-      console.log("⚠️ RECAPTCHA_SECRET_KEY:", !!process.env.RECAPTCHA_SECRET_KEY);
-      console.log("⚠️ Token presente:", !!token);
-      
-      // En producción, requerir reCAPTCHA
-      if (!token) {
-        return res.status(400).json({ 
-          message: "Token de reCAPTCHA requerido",
-          details: "Debe completar la verificación reCAPTCHA"
-        });
-      }
+      console.log("⚠️ Token reCAPTCHA faltante");
+      return res.status(400).json({ 
+        message: "Token de reCAPTCHA requerido",
+        details: "Debe completar la verificación reCAPTCHA"
+      });
     }
 
     console.log("💾 Guardando lead en MongoDB...");
