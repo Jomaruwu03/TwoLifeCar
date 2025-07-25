@@ -175,7 +175,7 @@ function App() {
             {/* reCAPTCHA Placeholder */}
             <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center">
               <ReCAPTCHA
-              sitekey="6Ld2UHorAAAAAEauS5-9aLll9XVNfDvm4-G-NgRI"
+              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LdsEY8rAAAAAMWCEfidFxT-o9-0fgRdMjTQASY9"}
           onChange={(token) => setToken(token)}
               />
             </div>
