@@ -18,6 +18,12 @@ dist-ssr
 .env.production
 .env.development
 .env.development.local
+
+# Google Cloud credentials - CRÍTICO: NUNCA SUBIR
+credentials/
+service-account*.json
+*.pem
+*.key
 .env.test.local
 .env.production.local
 .env.staging

@@ -32,5 +32,6 @@ app.get("/", (req, res) => {
 
 app.use("/api", require("./routes/leadRoutes"));
 app.use("/api/discord", require("./routes/discordRoutes"));
+app.use("/api/recaptcha", require("./routes/recaptchaRoutes"));
 
 app.listen(process.env.PORT, () => console.log(`🚀 API en http://localhost:${process.env.PORT}`));

@@ -1,7 +1,8 @@
+require('dotenv').config();
 const axios = require('axios');
 
 // Configuración
-const API_BASE_URL = 'http://localhost:5000';
+const apiUrl = 'http://localhost:5001';
 
 // Colores para la consola
 const colors = {
@@ -21,7 +22,7 @@ const log = (color, message) => console.log(`${colors[color]}${message}${colors.
 async function checkAPIStatus() {
   try {
     log('blue', '🏥 1. Verificando estado general de la API...');
-    const response = await axios.get(`${API_BASE_URL}/`);
+    const response = await axios.get(`${apiUrl}/`);
     log('green', '✅ API funcionando correctamente');
     log('cyan', `   Estado: ${response.data.status}`);
     log('cyan', `   Environment: ${response.data.environment}`);
@@ -41,7 +42,7 @@ async function checkAPIStatus() {
 async function checkDiscordStatus() {
   try {
     log('blue', '🎮 2. Verificando estado específico de Discord...');
-    const response = await axios.get(`${API_BASE_URL}/api/discord/status`);
+    const response = await axios.get(`${apiUrl}/api/discord/status`);
     log('green', '✅ Discord endpoint funcionando');
     log('cyan', `   Configurado: ${response.data.configured}`);
     log('cyan', `   Webhook: ${response.data.webhookUrl}`);
@@ -59,7 +60,7 @@ async function checkDiscordStatus() {
 async function testDiscordNotification() {
   try {
     log('blue', '🧪 3. Enviando notificación de prueba a Discord...');
-    const response = await axios.get(`${API_BASE_URL}/api/discord/test`);
+    const response = await axios.get(`${apiUrl}/api/discord/test`);
     log('green', '✅ Notificación de prueba enviada');
     log('cyan', `   Respuesta: ${response.data.message}`);
     console.log('');
@@ -92,7 +93,7 @@ async function simulateLandingFormSubmission() {
     log('cyan', `      Términos aceptados: ${leadData.acceptedTerms}`);
     log('yellow', '   ⚠️  Sin token reCAPTCHA (modo test)');
     
-    const response = await axios.post(`${API_BASE_URL}/api/leads`, leadData);
+    const response = await axios.post(`${apiUrl}/api/leads`, leadData);
     
     log('green', '✅ Lead creado exitosamente');
     log('cyan', `   Respuesta: ${response.data.message}`);
@@ -119,7 +120,7 @@ async function checkCreatedLeads() {
       'x-api-key': process.env.PRIVATE_API_KEY || 'K4Z7UR6QsYuXFxdsR3fAi'
     };
     
-    const response = await axios.get(`${API_BASE_URL}/api/leads`, { headers });
+    const response = await axios.get(`${apiUrl}/api/leads`, { headers });
     
     const leads = response.data;
     log('green', `✅ Se encontraron ${leads.length} leads en total`);
@@ -153,7 +154,7 @@ async function sendCustomDiscordMessage() {
       color: 0x00ff00 // Verde para éxito
     };
     
-    const response = await axios.post(`${API_BASE_URL}/api/discord/send`, customMessage);
+    const response = await axios.post(`${apiUrl}/api/discord/send`, customMessage);
     
     log('green', '✅ Mensaje personalizado enviado a Discord');
     log('cyan', `   Título: ${customMessage.title}`);
@@ -171,7 +172,7 @@ async function sendCustomDiscordMessage() {
 // Función principal que ejecuta todo el test
 async function runCompleteTest() {
   log('bright', '🚀 INICIANDO TEST COMPLETO DE TWOLIFECAR - LANDING → DISCORD\n');
-  log('yellow', `📡 URL de la API: ${API_BASE_URL}\n`);
+  log('yellow', `📡 URL de la API: ${apiUrl}\n`);
   
   const results = {};
   

@@ -2,6 +2,7 @@ const axios = require("axios");
 const Lead = require("../models/Lead");
 const emailjs = require("emailjs-com");
 const DiscordService = require("../services/discordService");
+const RecaptchaEnterpriseService = require("../services/recaptchaEnterpriseService");
 
 exports.createLead = async (req, res) => {
   const { name, email, message, token, acceptedTerms } = req.body;
@@ -19,6 +20,9 @@ exports.createLead = async (req, res) => {
     return res.status(400).json({ message: "Debe aceptar los términos y condiciones" });
   }
 
+  // Instancia del servicio reCAPTCHA Enterprise
+  const recaptchaService = new RecaptchaEnterpriseService();
+
   try {
     // Verificar conexión a MongoDB
     const mongoose = require("mongoose");
@@ -29,9 +33,27 @@ exports.createLead = async (req, res) => {
       return res.status(500).json({ message: "Base de datos no disponible" });
     }
 
-    // Validar reCAPTCHA solo si está configurado
-    if (process.env.RECAPTCHA_SECRET_KEY && token) {
-      console.log("🔍 Validando reCAPTCHA...");
+    // Validar reCAPTCHA Enterprise (nuevo sistema)
+    if (process.env.GOOGLE_CLOUD_PROJECT_ID && token) {
+      console.log("🛡️ Validando reCAPTCHA Enterprise...");
+      
+      const recaptchaResult = await recaptchaService.validateToken(token);
+      
+      if (!recaptchaResult.success) {
+        console.error("❌ reCAPTCHA Enterprise falló:", recaptchaResult);
+        recaptchaService.close(); // Cerrar conexión
+        return res.status(400).json({ 
+          message: "Verificación de seguridad fallida", 
+          details: recaptchaResult.message,
+          score: recaptchaResult.score 
+        });
+      }
+      
+      console.log("✅ reCAPTCHA Enterprise validado exitosamente. Puntuación:", recaptchaResult.score);
+      
+    } else if (process.env.RECAPTCHA_SECRET_KEY && token) {
+      // Fallback al sistema legacy de reCAPTCHA v2
+      console.log("🔍 Validando reCAPTCHA legacy...");
       const verify = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
         params: {
           secret: process.env.RECAPTCHA_SECRET_KEY,
@@ -39,10 +61,11 @@ exports.createLead = async (req, res) => {
         },
       });
 
-      console.log("🔍 Resultado reCAPTCHA:", verify.data);
+      console.log("🔍 Resultado reCAPTCHA legacy:", verify.data);
 
       if (!verify.data.success) {
-        console.error("❌ reCAPTCHA falló:", verify.data);
+        console.error("❌ reCAPTCHA legacy falló:", verify.data);
+        recaptchaService.close(); // Cerrar conexión
         return res.status(400).json({ message: "reCAPTCHA failed" });
       }
     } else {
@@ -125,6 +148,9 @@ exports.createLead = async (req, res) => {
       message: "Error interno del servidor",
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
+  } finally {
+    // Cerrar conexión del servicio reCAPTCHA Enterprise para evitar memory leaks
+    recaptchaService.close();
   }
 };
 

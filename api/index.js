@@ -82,7 +82,8 @@ app.get("/", (req, res) => {
       discord: !!process.env.DISCORD_WEBHOOK_URL ? "configured" : "not configured",
       slack: !!process.env.SLACK_WEBHOOK_URL ? "configured" : "not configured",
       mongodb: "connected",
-      recaptcha: !!process.env.RECAPTCHA_SECRET_KEY ? "configured" : "not configured"
+      recaptcha_legacy: !!process.env.RECAPTCHA_SECRET_KEY ? "configured" : "not configured",
+      recaptcha_enterprise: !!process.env.GOOGLE_CLOUD_PROJECT_ID ? "configured" : "not configured"
     },
     endpoints: {
       leads: "/api/leads",
@@ -90,7 +91,10 @@ app.get("/", (req, res) => {
       login: "/api/login",
       createAdmin: "/api/create-admin",
       discord_status: "/api/discord/status",
-      discord_test: "/api/discord/test"
+      discord_test: "/api/discord/test",
+      recaptcha_status: "/api/recaptcha/status",
+      recaptcha_config: "/api/recaptcha/config",
+      recaptcha_test: "/api/recaptcha/test"
     },
     adminCredentials: {
       username: "admin",
@@ -113,8 +117,10 @@ app.get("/api/health", (req, res) => {
     },
     environment: {
       nodeEnv: process.env.NODE_ENV,
-      hasRecaptcha: !!process.env.RECAPTCHA_SECRET_KEY,
+      hasRecaptchaLegacy: !!process.env.RECAPTCHA_SECRET_KEY,
+      hasRecaptchaEnterprise: !!process.env.GOOGLE_CLOUD_PROJECT_ID,
       hasSlack: !!process.env.SLACK_WEBHOOK_URL,
+      hasDiscord: !!process.env.DISCORD_WEBHOOK_URL,
       hasMongoUri: !!process.env.MONGODB_URI
     }
   });
@@ -156,6 +162,7 @@ app.post("/api/test-lead", async (req, res) => {
 app.use("/api", require("./routes/authRoutes"));
 app.use("/api", require("./routes/leadRoutes"));
 app.use("/api/discord", require("./routes/discordRoutes"));
+app.use("/api/recaptcha", require("./routes/recaptchaRoutes"));
 
 // Add a route to ignore favicon requests
 app.get('/favicon.ico', (req, res) => res.status(204).end());
