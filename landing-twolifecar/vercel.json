@@ -9,6 +9,11 @@
       }
     }
   ],
+  "env": {
+    "VITE_API_URL": "https://twolifecar-api-psi.vercel.app/api",
+    "VITE_RECAPTCHA_SITE_KEY": "6Ld2UHorAAAAAEauS5-9aLll9XVNfDvm4-G-NgRI",
+    "VITE_RECAPTCHA_ENTERPRISE_SITE_KEY": "6LeKw44rAAAAAEeD0TOL0M_zAA7_hiujVT0ltfKu"
+  },
   "routes": [
     {
       "handle": "filesystem"
