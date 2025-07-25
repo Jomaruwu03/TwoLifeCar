@@ -143,12 +143,6 @@ function ReplyModal({ isOpen, onClose, leadEmail, leadName }) {
   );
 }
 
-// --------- LOGIN ULTRA MEJORADO ---------
-
-// --------- LOGIN ULTRA MEJORADO ---------
-
-// --------- LOGIN ULTRA MEJORADO ---------
-
 function Login() {
   const navigate = useNavigate();
   const [user, setUser] = useState({ username: "", password: "" });
@@ -215,7 +209,7 @@ function Login() {
       </div>
 
       {/* Contenido principal */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+      <div className="relative z-10 min-h-screen flex items-center justify-center ">
         <div className="w-full max-w-md">
           
           {/* Header de marca mejorado */}
@@ -555,6 +549,8 @@ function Dashboard() {
   const [replyModal, setReplyModal] = useState({ isOpen: false, lead: null });
   const [archiveModal, setArchiveModal] = useState({ isOpen: false, leadId: null });
   const [logoutModal, setLogoutModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const token = localStorage.getItem("token");
 
   const getLeads = useCallback(() => {
@@ -583,22 +579,29 @@ function Dashboard() {
   const handleDelete = (id) => {
     axios.delete(`${API_URL}/leads/${id}`)
       .then(() => {
-        alert("Lead archivado");
+        alert("Lead archivado correctamente");
         getLeads();
         setArchiveModal({ isOpen: false, leadId: null });
       })
-      .catch(() => alert("Error al archivar"));
+      .catch(() => alert("Error al archivar el lead"));
   };
+
+  // Filtrar leads
+  const filteredLeads = leads.filter(lead => {
+    const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         lead.email.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
+  });
 
   if (loading) return (
     <div className="flex h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="text-center">
         <div className="relative mb-6">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-200 mx-auto"></div>
-          <div className="absolute inset-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-orange-500 mx-auto" style={{animationDuration: '1s'}}></div>
+          <div className="animate-spin rounded-full h-20 w-20 border-4 border-orange-200 mx-auto"></div>
+          <div className="absolute inset-0 animate-spin rounded-full h-20 w-20 border-4 border-transparent border-t-orange-500 mx-auto"></div>
         </div>
-        <p className="text-gray-600 text-lg font-medium">Cargando leads...</p>
-        <p className="text-gray-400 text-sm mt-1">Por favor espera un momento</p>
+        <p className="text-gray-700 text-xl font-semibold">Cargando dashboard...</p>
+        <p className="text-gray-500 text-sm mt-2">Preparando tu espacio de trabajo</p>
       </div>
     </div>
   );
@@ -606,96 +609,201 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-40">
+      {/* Header Moderno */}
+      <header className="bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
+            
+            {/* Logo y branding */}
             <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl blur-lg opacity-75"></div>
-                <div className="relative bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 p-3 rounded-2xl shadow-lg">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl blur-md opacity-70 group-hover:opacity-90 transition-opacity"></div>
+                <div className="relative bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-2xl shadow-lg transform group-hover:scale-105 transition-transform">
                   <Car className="w-8 h-8 text-white" />
                 </div>
               </div>
               <div>
-                <h1 className="text-3xl font-black text-gray-800">
-                  Two<span className="bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">Life</span>Car
+                <h1 className="text-2xl font-black text-gray-800">
+                  Two<span className="text-orange-500">Life</span>Car
                 </h1>
-                <p className="text-gray-600 font-medium">Dashboard de Gestión</p>
+                <p className="text-gray-600 font-medium text-sm">Panel de Administración</p>
               </div>
             </div>
             
+            {/* Acciones del header */}
             <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200">
-                <Bell size={20} />
-              </button>
-              <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200">
-                <Search size={20} />
-              </button>
+              <div className="hidden md:flex items-center space-x-3">
+                <button className="relative p-3 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-xl transition-all duration-200 group">
+                  <Bell size={20} />
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">3</div>
+                </button>
+                <button className="p-3 text-gray-600 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-200">
+                  <Settings size={20} />
+                </button>
+              </div>
+              
+              <div className="w-px h-8 bg-gray-300"></div>
+              
               <button 
                 onClick={() => setLogoutModal(true)} 
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-xl flex items-center space-x-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2.5 rounded-xl flex items-center space-x-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
               >
                 <LogOut size={16} />
-                <span>Cerrar Sesión</span>
+                <span className="hidden sm:inline">Cerrar Sesión</span>
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
         
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity"></div>
-            <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium mb-1">Total Leads</p>
-                  <p className="text-3xl font-bold text-gray-800">94%</p>
-                  <p className="text-purple-600 text-xs font-semibold mt-1">Muy buena</p>
+        {/* Hero Section con estadísticas */}
+        <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-3xl p-8 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl"></div>
+          
+          <div className="relative z-10">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-black mb-3">¡Bienvenido de vuelta!</h2>
+                <p className="text-white/90 text-lg">Aquí tienes un resumen de tu actividad hoy</p>
+              </div>
+              <div className="mt-4 lg:mt-0">
+                <div className="text-right">
+                  <p className="text-white/80 text-sm">Último acceso</p>
+                  <p className="text-white font-semibold">Hoy, {new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-2xl shadow-lg">
-                  <MessageSquare className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            
+            {/* Estadísticas principales */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-white/20 p-2 rounded-xl">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white/80 text-sm">Total Leads</p>
+                    <p className="text-2xl font-bold text-white">{leads.length}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-white/20 p-2 rounded-xl">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white/80 text-sm">Nuevos Hoy</p>
+                    <p className="text-2xl font-bold text-white">8</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-white/20 p-2 rounded-xl">
+                    <MessageSquare className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white/80 text-sm">Respondidos</p>
+                    <p className="text-2xl font-bold text-white">24</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-white/20 p-2 rounded-xl">
+                    <CheckCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white/80 text-sm">Conversiones</p>
+                    <p className="text-2xl font-bold text-white">12</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Leads Table */}
-        <div className="relative">
-          <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-3xl border border-gray-200/50"></div>
-          <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-gray-200/50">
-            
-            {/* Table Header */}
-            <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 border-b border-gray-200/50">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-1">Leads Recientes</h3>
-                  <p className="text-gray-600">Gestiona las consultas de tus clientes</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <button className="bg-white/80 hover:bg-white border border-gray-200 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all duration-200 text-gray-700 hover:text-gray-900">
-                    <Filter size={16} />
-                    <span className="font-medium">Filtrar</span>
-                  </button>
-                  <button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl flex items-center space-x-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium">
-                    <Search size={16} />
-                    <span>Buscar</span>
-                  </button>
-                </div>
+        {/* Barra de búsqueda y filtros */}
+        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+          <div className="flex flex-col lg:flex-row gap-4 justify-between items-center">
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar leads por nombre o email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-0 transition-all duration-300 text-gray-800 outline-none font-medium"
+                />
               </div>
             </div>
             
-            <div className="overflow-x-auto">
+            <div className="flex items-center space-x-3">
+              <select 
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-0 transition-all duration-300 text-gray-800 outline-none font-medium bg-white"
+              >
+                <option value="all">Todos los estados</option>
+                <option value="new">Nuevos</option>
+                <option value="replied">Respondidos</option>
+                <option value="archived">Archivados</option>
+              </select>
+              
+              <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl flex items-center space-x-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium">
+                <Plus size={16} />
+                <span className="hidden sm:inline">Nuevo Lead</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabla de Leads Modernizada */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          
+          {/* Header de la tabla */}
+          <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 border-b border-gray-200">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-1">
+                  Leads Recientes
+                  <span className="ml-3 text-sm bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-medium">
+                    {filteredLeads.length} total
+                  </span>
+                </h3>
+                <p className="text-gray-600">Gestiona las consultas de tus clientes de manera eficiente</p>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <button className="bg-white border-2 border-gray-200 hover:border-gray-300 px-4 py-2 rounded-xl flex items-center space-x-2 transition-all duration-200 text-gray-700 hover:text-gray-900 font-medium shadow-sm hover:shadow-md">
+                  <Filter size={16} />
+                  <span>Filtros</span>
+                </button>
+                <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium">
+                  <Archive size={16} />
+                  <span>Exportar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Tabla responsiva */}
+          <div className="overflow-x-auto">
+            {filteredLeads.length > 0 ? (
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-gray-50 to-slate-50">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Cliente</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Email</th>
+                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Contacto</th>
                     <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Consulta</th>
                     <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Fecha</th>
                     <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Estado</th>
@@ -703,54 +811,73 @@ function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {leads.map((lead, index) => (
-                    <tr key={lead._id} className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 transition-all duration-200 group">
+                  {filteredLeads.map((lead, index) => (
+                    <tr key={lead._id} className="hover:bg-gray-50 transition-all duration-200 group">
                       <td className="px-6 py-5">
                         <div className="flex items-center space-x-4">
                           <div className="relative">
-                            <div className="bg-gradient-to-r from-orange-400 to-pink-500 p-3 rounded-2xl shadow-lg">
-                              <User className="w-5 h-5 text-white" />
+                            <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
+                              <span className="text-white font-bold text-lg">
+                                {lead.name.charAt(0).toUpperCase()}
+                              </span>
                             </div>
                             <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></div>
                           </div>
                           <div>
                             <p className="font-bold text-gray-800 text-lg">{lead.name}</p>
-                            <p className="text-gray-500 text-sm">Cliente #{index + 1}</p>
+                            <p className="text-gray-500 text-sm">Lead #{(index + 1).toString().padStart(3, '0')}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-5">
-                        <div className="flex items-center space-x-2">
-                          <Mail className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-700 font-medium">{lead.email}</span>
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <Mail className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-700 font-medium text-sm">{lead.email}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <User className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-500 text-sm">Cliente potencial</span>
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-5">
                         <div className="max-w-xs">
-                          <p className="text-gray-800 font-medium line-clamp-2" title={lead.message}>
+                          <p className="text-gray-800 font-medium text-sm line-clamp-3 leading-relaxed" title={lead.message}>
                             {lead.message}
                           </p>
+                          {lead.message.length > 100 && (
+                            <button className="text-orange-500 text-sm font-medium hover:underline mt-1">
+                              Ver más
+                            </button>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-5">
-                        <div className="text-gray-600">
-                          <p className="font-semibold">
-                            {new Date(lead.createdAt).toLocaleDateString('es-ES', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric'
-                            })}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            {new Date(lead.createdAt).toLocaleTimeString('es-ES', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </p>
+                        <div className="text-gray-600 space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <span className="font-semibold text-sm">
+                              {new Date(lead.createdAt).toLocaleDateString('es-ES', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Clock className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-400 text-sm">
+                              {new Date(lead.createdAt).toLocaleTimeString('es-ES', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-5">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+                        <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
                           <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
                           Nuevo
                         </span>
@@ -759,17 +886,17 @@ function Dashboard() {
                         <div className="flex items-center space-x-2">
                           <button 
                             onClick={() => setReplyModal({ isOpen: true, lead })} 
-                            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 py-2 rounded-xl text-sm transition-all duration-300 flex items-center space-x-2 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-sm transition-all duration-300 flex items-center space-x-2 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                           >
                             <Send size={14} />
-                            <span>Responder</span>
+                            <span className="hidden lg:inline">Responder</span>
                           </button>
                           <button 
                             onClick={() => setArchiveModal({ isOpen: true, leadId: lead._id })} 
-                            className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-4 py-2 rounded-xl text-sm transition-all duration-300 flex items-center space-x-2 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-xl text-sm transition-all duration-300 flex items-center space-x-2 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                           >
                             <Archive size={14} />
-                            <span>Archivar</span>
+                            <span className="hidden lg:inline">Archivar</span>
                           </button>
                           <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-200">
                             <MoreVertical size={16} />
@@ -780,78 +907,133 @@ function Dashboard() {
                   ))}
                 </tbody>
               </table>
-              
-              {!leads.length && (
-                <div className="text-center py-16">
-                  <div className="relative mb-6">
-                    <div className="bg-gradient-to-r from-gray-100 to-slate-100 p-6 rounded-full w-20 h-20 mx-auto flex items-center justify-center shadow-lg">
-                      <MessageSquare className="w-10 h-10 text-gray-400" />
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">0</span>
-                    </div>
+            ) : (
+              <div className="text-center py-20">
+                <div className="relative mb-8">
+                  <div className="bg-gradient-to-r from-gray-100 to-slate-100 p-8 rounded-full w-24 h-24 mx-auto flex items-center justify-center shadow-xl">
+                    <MessageSquare className="w-12 h-12 text-gray-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">No hay leads disponibles</h3>
-                  <p className="text-gray-500 mb-6">Los nuevos leads aparecerán aquí automáticamente</p>
-                  <button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
-                    Actualizar Lista
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-white text-xs font-bold">0</span>
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                  {searchTerm ? 'No se encontraron resultados' : 'No hay leads disponibles'}
+                </h3>
+                <p className="text-gray-500 mb-8 max-w-md mx-auto leading-relaxed">
+                  {searchTerm 
+                    ? `No encontramos leads que coincidan con "${searchTerm}". Intenta con otros términos de búsqueda.`
+                    : 'Los nuevos leads aparecerán aquí automáticamente. ¡Prepárate para gestionar tus próximas oportunidades!'
+                  }
+                </p>
+                <div className="flex items-center justify-center space-x-4">
+                  {searchTerm && (
+                    <button 
+                      onClick={() => setSearchTerm("")}
+                      className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+                    >
+                      Limpiar búsqueda
+                    </button>
+                  )}
+                  <button 
+                    onClick={getLeads}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <Search size={16} />
+                    <span>Actualizar Lista</span>
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="relative group cursor-pointer">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity"></div>
-            <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300 group-hover:transform group-hover:-translate-y-1">
-              <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-2xl shadow-lg">
-                  <Mail className="w-6 h-6 text-white" />
+        {/* Acciones Rápidas Mejoradas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <div className="group cursor-pointer">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-blue-200 transition-all duration-300 group-hover:transform group-hover:-translate-y-2">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Mail className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-bold text-gray-800">Enviar Masivo</h4>
+                  <h4 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">Envío Masivo</h4>
                   <p className="text-gray-600 text-sm">Responder a múltiples leads</p>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="relative group cursor-pointer">
-            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity"></div>
-            <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300 group-hover:transform group-hover:-translate-y-1">
-              <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-3 rounded-2xl shadow-lg">
-                  <Calendar className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h4 className="text-lg font-bold text-gray-800">Programar Citas</h4>
-                  <p className="text-gray-600 text-sm">Gestionar calendario</p>
-                </div>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Envía respuestas personalizadas a varios clientes potenciales al mismo tiempo.
+              </p>
+              <div className="mt-4 flex items-center text-blue-500 font-medium text-sm group-hover:text-blue-600">
+                <span>Comenzar</span>
+                <TrendingUp className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </div>
 
-          <div className="relative group cursor-pointer">
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity"></div>
-            <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300 group-hover:transform group-hover:-translate-y-1">
-              <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-2xl shadow-lg">
-                  <TrendingUp className="w-6 h-6 text-white" />
+          <div className="group cursor-pointer">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-green-200 transition-all duration-300 group-hover:transform group-hover:-translate-y-2">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="bg-gradient-to-r from-green-500 to-green-600 p-4 rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Calendar className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-bold text-gray-800">Reportes</h4>
+                  <h4 className="text-xl font-bold text-gray-800 group-hover:text-green-600 transition-colors">Programar Citas</h4>
+                  <p className="text-gray-600 text-sm">Gestionar calendario</p>
+                </div>
+              </div>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Organiza reuniones y citas con tus clientes de forma eficiente.
+              </p>
+              <div className="mt-4 flex items-center text-green-500 font-medium text-sm group-hover:text-green-600">
+                <span>Abrir calendario</span>
+                <TrendingUp className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </div>
+
+          <div className="group cursor-pointer">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-purple-200 transition-all duration-300 group-hover:transform group-hover:-translate-y-2">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-4 rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow">
+                  <TrendingUp className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-gray-800 group-hover:text-purple-600 transition-colors">Reportes</h4>
                   <p className="text-gray-600 text-sm">Análisis y estadísticas</p>
                 </div>
+              </div>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Visualiza métricas detalladas y tendencias de tus leads.
+              </p>
+              <div className="mt-4 flex items-center text-purple-500 font-medium text-sm group-hover:text-purple-600">
+                <span>Ver reportes</span>
+                <TrendingUp className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </div>
         </div>
+
+        {/* Footer del Dashboard */}
+        <div className="text-center py-8">
+          <div className="flex items-center justify-center gap-6 text-sm text-gray-500 mb-4">
+            <div className="flex items-center gap-2">
+              <Car className="w-4 h-4 text-orange-500" />
+              <span className="font-medium">© 2025 TwoLifeCar</span>
+            </div>
+            <span>•</span>
+            <span>Panel de Administración</span>
+            <span>•</span>
+            <span className="text-green-600 font-medium">Sistema Activo</span>
+          </div>
+          <p className="text-gray-400 text-xs max-w-md mx-auto">
+            Plataforma profesional de gestión de leads para concesionarias automotrices
+          </p>
+        </div>
       </div>
 
-      {/* Modals */}
+      {/* Modals - usando los componentes ya definidos */}
       <ReplyModal 
         isOpen={replyModal.isOpen} 
         onClose={() => setReplyModal({ isOpen: false, lead: null })} 
