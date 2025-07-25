@@ -11,13 +11,20 @@ node_modules
 dist
 dist-ssr
 *.local
+# Environment variables - CRÍTICO: NUNCA SUBIR
 .env
+.env.*
 .env.local
 .env.production
 .env.development
 .env.development.local
 .env.test.local
 .env.production.local
+.env.staging
+
+# Archivos de configuración sensibles
+config.json
+secrets.json
 
 # Testing
 test-api.js
