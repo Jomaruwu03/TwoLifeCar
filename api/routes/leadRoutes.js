@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { createLead, getLeads, deleteLead } = require("../controllers/leadController");
+const { createLead, getLeads, deleteLead, testRecaptcha } = require("../controllers/leadController");
 const { verifyToken } = require("../middlewares/authMiddleware");
 
 router.post("/leads", createLead);
 router.get("/leads", verifyToken, getLeads);
 router.delete("/leads/:id", verifyToken, deleteLead);
+router.get("/test-recaptcha", testRecaptcha); // Endpoint de prueba sin autenticación
 router.post("/leads/reply", async (req, res) => {
   const { email, subject, message } = req.body;
 

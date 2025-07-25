@@ -7,17 +7,36 @@ const RecaptchaEnterpriseService = require("../services/recaptchaEnterpriseServi
 exports.createLead = async (req, res) => {
   const { name, email, message, token, acceptedTerms } = req.body;
 
-  console.log("📨 Datos recibidos:", { name, email, message, token: token ? "✅" : "❌", acceptedTerms });
+  console.log("📨 Datos recibidos:", { 
+    name, 
+    email, 
+    message: message?.substring(0, 50) + "...", 
+    token: token ? `${token.substring(0, 10)}...` : "❌", 
+    acceptedTerms,
+    tokenLength: token?.length,
+    origin: req.headers.origin,
+    userAgent: req.headers['user-agent']?.substring(0, 50) + "..."
+  });
 
   // Validar campos requeridos
   if (!name || !email || !message) {
     console.error("❌ Validación fallida: campos requeridos faltantes");
-    return res.status(400).json({ message: "Nombre, email y mensaje son requeridos" });
+    return res.status(400).json({ 
+      message: "Nombre, email y mensaje son requeridos",
+      missing: {
+        name: !name,
+        email: !email, 
+        message: !message
+      }
+    });
   }
 
   if (!acceptedTerms) {
     console.error("❌ Validación fallida: términos no aceptados");
-    return res.status(400).json({ message: "Debe aceptar los términos y condiciones" });
+    return res.status(400).json({ 
+      message: "Debe aceptar los términos y condiciones",
+      details: "acceptedTerms debe ser true"
+    });
   }
 
   // Instancia del servicio reCAPTCHA Enterprise
@@ -54,6 +73,9 @@ exports.createLead = async (req, res) => {
     } else if (process.env.RECAPTCHA_SECRET_KEY && token) {
       // Fallback al sistema legacy de reCAPTCHA v2
       console.log("🔍 Validando reCAPTCHA legacy...");
+      console.log("🔍 Secret Key presente:", !!process.env.RECAPTCHA_SECRET_KEY);
+      console.log("🔍 Token recibido:", token.substring(0, 20) + "...");
+      
       const verify = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
         params: {
           secret: process.env.RECAPTCHA_SECRET_KEY,
@@ -61,15 +83,50 @@ exports.createLead = async (req, res) => {
         },
       });
 
-      console.log("🔍 Resultado reCAPTCHA legacy:", verify.data);
+      console.log("🔍 Resultado completo reCAPTCHA legacy:", verify.data);
 
       if (!verify.data.success) {
         console.error("❌ reCAPTCHA legacy falló:", verify.data);
+        console.error("❌ Error codes:", verify.data['error-codes']);
         recaptchaService.close(); // Cerrar conexión
-        return res.status(400).json({ message: "reCAPTCHA failed" });
+        
+        // Proporcionar mensaje más específico basado en el error
+        let errorMessage = "Verificación de reCAPTCHA fallida";
+        if (verify.data['error-codes']) {
+          const errors = verify.data['error-codes'];
+          if (errors.includes('invalid-input-secret')) {
+            errorMessage = "Error de configuración del servidor";
+          } else if (errors.includes('invalid-input-response')) {
+            errorMessage = "Token de reCAPTCHA inválido";
+          } else if (errors.includes('bad-request')) {
+            errorMessage = "Solicitud de reCAPTCHA malformada";
+          } else if (errors.includes('timeout-or-duplicate')) {
+            errorMessage = "Token de reCAPTCHA expirado o ya usado";
+          }
+        }
+        
+        return res.status(400).json({ 
+          message: errorMessage,
+          details: verify.data['error-codes']?.join(', ') || "Error de verificación",
+          debug: process.env.NODE_ENV === 'development' ? verify.data : undefined
+        });
       }
+      
+      console.log("✅ reCAPTCHA legacy validado exitosamente");
+      
     } else {
       console.log("⚠️ reCAPTCHA no configurado o token faltante");
+      console.log("⚠️ GOOGLE_CLOUD_PROJECT_ID:", !!process.env.GOOGLE_CLOUD_PROJECT_ID);
+      console.log("⚠️ RECAPTCHA_SECRET_KEY:", !!process.env.RECAPTCHA_SECRET_KEY);
+      console.log("⚠️ Token presente:", !!token);
+      
+      // En producción, requerir reCAPTCHA
+      if (!token) {
+        return res.status(400).json({ 
+          message: "Token de reCAPTCHA requerido",
+          details: "Debe completar la verificación reCAPTCHA"
+        });
+      }
     }
 
     console.log("💾 Guardando lead en MongoDB...");
@@ -180,6 +237,31 @@ exports.replyLead = async (req, res) => {
     res.json({ message: `Responder a: ${email}` });
   } catch (error) {
     console.error("Error replying lead:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Endpoint de prueba para verificar configuración de reCAPTCHA
+exports.testRecaptcha = async (req, res) => {
+  try {
+    console.log("🧪 Test de configuración reCAPTCHA");
+    
+    const config = {
+      hasEnterpriseConfig: !!process.env.GOOGLE_CLOUD_PROJECT_ID,
+      hasLegacyConfig: !!process.env.RECAPTCHA_SECRET_KEY,
+      environment: process.env.NODE_ENV || 'development'
+    };
+    
+    console.log("🔍 Configuración:", config);
+    
+    res.json({
+      message: "Configuración reCAPTCHA",
+      config,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error("Error in test:", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
 };
