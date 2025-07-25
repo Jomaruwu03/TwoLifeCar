@@ -172,16 +172,14 @@ function App() {
               </div>
             </div>
 
-            {/* reCAPTCHA Enterprise */}
+            {/* reCAPTCHA - Usando Legacy temporalmente */}
             <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center">
               <ReCAPTCHA
-              sitekey={import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY || import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeKw44rAAAAAEeD0TOL0M_zAA7_hiujVT0ltfKu"}
-          onChange={(token) => setToken(token)}
+                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6Ld2UHorAAAAAEauS5-9aLll9XVNfDvm4-G-NgRI"}
+                onChange={(token) => setToken(token)}
               />
               <p className="text-xs text-gray-500 mt-2">
-                {import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY ? 
-                  "🛡️ Protegido por reCAPTCHA Enterprise" : 
-                  "🔒 Protegido por reCAPTCHA"}
+                🔒 Protegido por reCAPTCHA v2
               </p>
             </div>
 
