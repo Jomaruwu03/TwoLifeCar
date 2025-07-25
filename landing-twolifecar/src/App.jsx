@@ -15,6 +15,12 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log("🔍 Debugging info:");
+    console.log("- API URL:", API_URL);
+    console.log("- Form data:", form);
+    console.log("- Token presente:", !!token);
+    console.log("- Términos aceptados:", acceptedTerms);
+    
     if (!acceptedTerms) {
       alert("Debes aceptar los términos y condiciones para continuar.");
       return;
@@ -39,14 +45,29 @@ function App() {
       setAcceptedTerms(false);
     } catch (error) {
       console.error("Error al enviar formulario:", error);
-      alert("Error al enviar el formulario. Inténtalo de nuevo.");
+      
+      // Mostrar detalles específicos del error
+      if (error.response?.data) {
+        console.error("Detalles del error:", error.response.data);
+        const errorMessage = error.response.data.message || error.response.data.details || "Error desconocido";
+        alert(`Error: ${errorMessage}`);
+      } else {
+        alert("Error al enviar el formulario. Inténtalo de nuevo.");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // eslint-disable-next-line no-unused-vars
   const handleRecaptchaChange = (value) => {
+    console.log("🔐 reCAPTCHA token recibido:", value ? "✅ Token válido" : "❌ Token vacío");
     setToken(value);
   };
+
+  // Debug de las variables de entorno
+  console.log("🔍 Variables de entorno:");
+  console.log("- VITE_RECAPTCHA_SITE_KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
+  console.log("- API URL:", API_URL);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 relative overflow-hidden">
@@ -176,10 +197,13 @@ function App() {
             <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center">
               <ReCAPTCHA
                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6Ld2UHorAAAAAEauS5-9aLll9XVNfDvm4-G-NgRI"}
-                onChange={(token) => setToken(token)}
+                onChange={handleRecaptchaChange}
               />
               <p className="text-xs text-gray-500 mt-2">
                 🔒 Protegido por reCAPTCHA v2
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Site Key: {import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6Ld2UHorAAAAAEauS5-9aLll9XVNfDvm4-G-NgRI"}
               </p>
             </div>
 
