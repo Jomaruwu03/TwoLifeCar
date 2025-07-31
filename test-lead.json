@@ -1,0 +1,7 @@
+{
+  "name": "Usuario Test Discord",
+  "email": "testdiscord@example.com",
+  "message": "Mensaje de prueba para verificar notificación Discord",
+  "acceptedTerms": true,
+  "token": "BYPASS_FOR_DISCORD_TEST"
+}

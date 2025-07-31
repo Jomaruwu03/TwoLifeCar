@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # API Service - Testing
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: twolifecar-api-test
+    ports:
+      - "5002:5001"
+    environment:
+      - NODE_ENV=test
+      - PORT=5001
+      - MONGODB_URI=mongodb://mongodb:27017/twolifecar_test
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL_TEST}
+      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY_TEST}
+      - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY_TEST}
+      - PRIVATE_API_KEY=${PRIVATE_API_KEY_TEST}
+      - JWT_SECRET=${JWT_SECRET_TEST}
+    volumes:
+      - api_test_logs:/usr/src/app/logs
+    networks:
+      - twolifecar-test-network
+    depends_on:
+      - mongodb
+      - redis
+    restart: "no"
+
+  # Dashboard Service - Testing
+  dashboard:
+    build:
+      context: ./dashboard-twolifecar
+      dockerfile: Dockerfile
+    container_name: twolifecar-dashboard-test
+    ports:
+      - "3002:80"
+    environment:
+      - NODE_ENV=test
+      - VITE_API_URL=http://api:5001
+    networks:
+      - twolifecar-test-network
+    depends_on:
+      - api
+    restart: "no"
+
+  # Landing Service - Testing
+  landing:
+    build:
+      context: ./landing-twolifecar
+      dockerfile: Dockerfile
+    container_name: twolifecar-landing-test
+    ports:
+      - "3003:80"
+    environment:
+      - NODE_ENV=test
+      - VITE_API_URL=http://api:5001
+    networks:
+      - twolifecar-test-network
+    depends_on:
+      - api
+    restart: "no"
+
+  # MongoDB Database - Testing
+  mongodb:
+    image: mongo:7-jammy
+    container_name: twolifecar-mongodb-test
+    ports:
+      - "27018:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=testuser
+      - MONGO_INITDB_ROOT_PASSWORD=testpass123
+      - MONGO_INITDB_DATABASE=twolifecar_test
+    volumes:
+      - mongodb_test_data:/data/db
+    networks:
+      - twolifecar-test-network
+    restart: "no"
+
+  # Redis para caché de pruebas
+  redis:
+    image: redis:7-alpine
+    container_name: twolifecar-redis-test
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_test_data:/data
+    networks:
+      - twolifecar-test-network
+    restart: "no"
+
+  # Servicio de testing con Playwright/Jest
+  test-runner:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    container_name: twolifecar-test-runner
+    environment:
+      - NODE_ENV=test
+      - API_URL=http://api:5001
+      - DASHBOARD_URL=http://dashboard:80
+      - LANDING_URL=http://landing:80
+    volumes:
+      - ./tests:/usr/src/app
+      - test_results:/usr/src/app/results
+    networks:
+      - twolifecar-test-network
+    depends_on:
+      - api
+      - dashboard
+      - landing
+      - mongodb
+      - redis
+    restart: "no"
+    profiles:
+      - testing
+
+networks:
+  twolifecar-test-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+volumes:
+  mongodb_test_data:
+    driver: local
+  redis_test_data:
+    driver: local
+  api_test_logs:
+    driver: local
+  test_results:
+    driver: local

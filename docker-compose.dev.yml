@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  # API Service
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: twolifecar-api-dev
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=development
+      - PORT=5001
+      - MONGODB_URI=${MONGODB_URI}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - GOOGLE_CLOUD_PROJECT_ID=${GOOGLE_CLOUD_PROJECT_ID}
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
+      - RECAPTCHA_ENTERPRISE_SITE_KEY=${RECAPTCHA_ENTERPRISE_SITE_KEY}
+      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
+      - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
+      - PRIVATE_API_KEY=${PRIVATE_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - EMAILJS_SERVICE_ID=${EMAILJS_SERVICE_ID}
+      - EMAILJS_TEMPLATE_ID=${EMAILJS_TEMPLATE_ID}
+      - EMAILJS_USER_ID=${EMAILJS_USER_ID}
+    volumes:
+      - ./api:/usr/src/app
+      - /usr/src/app/node_modules
+      - api_logs:/usr/src/app/logs
+    networks:
+      - twolifecar-network
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+    command: ["npm", "run", "dev"]
+
+  # Dashboard Service
+  dashboard:
+    build:
+      context: ./dashboard-twolifecar
+      dockerfile: Dockerfile
+      target: builder
+    container_name: twolifecar-dashboard-dev
+    ports:
+      - "3001:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:5001
+    volumes:
+      - ./dashboard-twolifecar:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - twolifecar-network
+    restart: unless-stopped
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+  # Landing Service
+  landing:
+    build:
+      context: ./landing-twolifecar
+      dockerfile: Dockerfile
+      target: builder
+    container_name: twolifecar-landing-dev
+    ports:
+      - "3000:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:5001
+    volumes:
+      - ./landing-twolifecar:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - twolifecar-network
+    restart: unless-stopped
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:7-jammy
+    container_name: twolifecar-mongodb-dev
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password123}
+      - MONGO_INITDB_DATABASE=twolifecar
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - twolifecar-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (opcional para desarrollo)
+  nginx:
+    image: nginx:alpine
+    container_name: twolifecar-nginx-dev
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx/dev.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - twolifecar-network
+    depends_on:
+      - api
+      - dashboard
+      - landing
+    restart: unless-stopped
+
+networks:
+  twolifecar-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+  api_logs:
+    driver: local

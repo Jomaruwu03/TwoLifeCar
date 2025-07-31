@@ -1,0 +1,23 @@
+# TwoLifeCar - API .dockerignore
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.nyc_output
+coverage
+.env
+.env.local
+.env.*.local
+*.log
+logs
+*.pid
+*.seed
+*.pid.lock
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+*.swp
+*.swo
+*~

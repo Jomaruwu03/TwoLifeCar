@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # API Service - Production
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: twolifecar-api
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+      - MONGODB_URI=${MONGODB_URI}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - GOOGLE_CLOUD_PROJECT_ID=${GOOGLE_CLOUD_PROJECT_ID}
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
+      - RECAPTCHA_ENTERPRISE_SITE_KEY=${RECAPTCHA_ENTERPRISE_SITE_KEY}
+      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
+      - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
+      - PRIVATE_API_KEY=${PRIVATE_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - EMAILJS_SERVICE_ID=${EMAILJS_SERVICE_ID}
+      - EMAILJS_TEMPLATE_ID=${EMAILJS_TEMPLATE_ID}
+      - EMAILJS_USER_ID=${EMAILJS_USER_ID}
+    volumes:
+      - api_logs:/usr/src/app/logs
+    networks:
+      - twolifecar-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Dashboard Service - Production
+  dashboard:
+    build:
+      context: ./dashboard-twolifecar
+      dockerfile: Dockerfile
+    container_name: twolifecar-dashboard
+    ports:
+      - "3001:80"
+    networks:
+      - twolifecar-network
+    depends_on:
+      - api
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # Landing Service - Production
+  landing:
+    build:
+      context: ./landing-twolifecar
+      dockerfile: Dockerfile
+    container_name: twolifecar-landing
+    ports:
+      - "3000:80"
+    networks:
+      - twolifecar-network
+    depends_on:
+      - api
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # Nginx Load Balancer & Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: twolifecar-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/prod.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/ssl:/etc/nginx/ssl:ro
+    networks:
+      - twolifecar-network
+    depends_on:
+      - api
+      - dashboard
+      - landing
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+networks:
+  twolifecar-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  api_logs:
+    driver: local
