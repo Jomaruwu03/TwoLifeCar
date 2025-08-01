@@ -7,8 +7,6 @@ services:
       context: ./landing-twolifecar
       dockerfile: Dockerfile
     container_name: twolifecar-landing
-    networks:
-      - default
     restart: unless-stopped
     deploy:
       resources:
@@ -19,15 +17,13 @@ services:
           memory: 128M
 
   # Nginx para servir solo la landing
-  nginx:
+  nginx-landing:
     image: nginx:alpine
-    container_name: twolifecar-nginx
+    container_name: twolifecar-nginx-landing-3210
     ports:
       - "3210:80"
     volumes:
       - ./docker/nginx/landing-debug.conf:/etc/nginx/nginx.conf:ro
-    networks:
-      - default
     depends_on:
       - landing
     restart: unless-stopped
@@ -36,10 +32,5 @@ services:
         limits:
           cpus: '0.25'
           memory: 128M
-
-networks:
-  default:
-    external: true
-    name: bridge
 
 

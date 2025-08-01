@@ -7,8 +7,6 @@ services:
       context: ./dashboard-twolifecar
       dockerfile: Dockerfile
     container_name: twolifecar-dashboard
-    networks:
-      - default
     restart: unless-stopped
     deploy:
       resources:
@@ -19,15 +17,13 @@ services:
           memory: 128M
 
   # Nginx para servir solo el dashboard
-  nginx:
+  nginx-dashboard:
     image: nginx:alpine
-    container_name: twolifecar-nginx-dashboard
+    container_name: twolifecar-nginx-dashboard-3209
     ports:
       - "3209:80"
     volumes:
       - ./docker/nginx/dashboard-debug.conf:/etc/nginx/nginx.conf:ro
-    networks:
-      - default
     depends_on:
       - dashboard
     restart: unless-stopped
@@ -36,8 +32,3 @@ services:
         limits:
           cpus: '0.25'
           memory: 128M
-
-networks:
-  default:
-    external: true
-    name: bridge
