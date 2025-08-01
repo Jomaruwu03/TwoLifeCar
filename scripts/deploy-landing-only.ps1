@@ -1,6 +1,6 @@
 # =====================================================
 # TwoLifeCar - Despliegue SOLO Landing Page
-# Script para subir únicamente la landing a www.3910.efdiaz.xyz
+# Script para subir únicamente la landing a www.3210.efdiaz.xyz
 # =====================================================
 
 param(
@@ -8,7 +8,7 @@ param(
     [switch]$SetupSSL = $false,
     
     [Parameter(Mandatory=$false)]
-    [string]$Domain = "3910.efdiaz.xyz"
+    [string]$Domain = "3210.efdiaz.xyz"
 )
 
 $ErrorActionPreference = "Stop"

@@ -5,10 +5,10 @@
 
 param(
     [Parameter(Mandatory=$false)]
-    [string]$Domain = "3910.efdiaz.xyz",
+    [string]$Domain = "3210.efdiaz.xyz",
     
     [Parameter(Mandatory=$false)]
-    [string]$Email = "admin@3910.efdiaz.xyz"
+    [string]$Email = "admin@3210.efdiaz.xyz"
 )
 
 Write-Host "🔐 Configurando SSL para TwoLifeCar en $Domain" -ForegroundColor Green

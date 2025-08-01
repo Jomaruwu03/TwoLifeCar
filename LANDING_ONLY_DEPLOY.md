@@ -1,6 +1,6 @@
 # 🌐 Despliegue SOLO Landing Page - TwoLifeCar
 
-## Para subir únicamente la Landing Page a https://www.3910.efdiaz.xyz
+## Para subir únicamente la Landing Page a https://www.3210.efdiaz.xyz
 
 ### 🚀 Despliegue Rápido
 
@@ -21,8 +21,8 @@
 - ✅ **Headers de seguridad**
 
 ### 🌐 URL Final
-- **Con SSL**: https://www.3910.efdiaz.xyz
-- **Sin SSL**: http://www.3910.efdiaz.xyz
+- **Con SSL**: https://www.3210.efdiaz.xyz
+- **Sin SSL**: http://www.3210.efdiaz.xyz
 
 ### 📊 Verificar que funciona:
 
@@ -34,7 +34,7 @@ docker-compose -f docker-compose.landing.yml ps
 docker-compose -f docker-compose.landing.yml logs -f
 
 # Test de conectividad
-curl https://www.3910.efdiaz.xyz
+curl https://www.3210.efdiaz.xyz
 ```
 
 ### 🔧 Comandos útiles:
@@ -54,7 +54,7 @@ docker-compose -f docker-compose.landing.yml up -d
 ### 🛠️ Troubleshooting:
 
 #### Si no carga la página:
-1. Verifica que el dominio apunte a tu servidor: `nslookup 3910.efdiaz.xyz`
+1. Verifica que el dominio apunte a tu servidor: `nslookup 3210.efdiaz.xyz`
 2. Verifica que los puertos 80/443 estén abiertos
 3. Revisa los logs: `docker-compose -f docker-compose.landing.yml logs nginx`
 
@@ -69,4 +69,4 @@ docker-compose -f docker-compose.landing.yml up -d
 - `scripts/deploy-landing-only.ps1` - Script de despliegue
 
 ---
-**¡Listo! Tu Landing Page estará accesible en https://www.3910.efdiaz.xyz** 🎉
+**¡Listo! Tu Landing Page estará accesible en https://www.3210.efdiaz.xyz** 🎉

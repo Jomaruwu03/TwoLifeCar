@@ -73,10 +73,10 @@ firewall-cmd --reload
 #### 5. Desplegar Landing Page
 ```bash
 # Con SSL (el dominio DEBE apuntar al servidor)
-./scripts/deploy-landing-ssh.sh --ssl --domain 3910.efdiaz.xyz
+./scripts/deploy-landing-ssh.sh --ssl --domain 3210.efdiaz.xyz
 
 # O sin SSL (para pruebas)
-./scripts/deploy-landing-ssh.sh --domain 3910.efdiaz.xyz
+./scripts/deploy-landing-ssh.sh --domain 3210.efdiaz.xyz
 ```
 
 ### 📋 Comandos de Administración SSH
@@ -93,7 +93,7 @@ docker-compose -f docker-compose.landing.yml logs -f
 docker-compose -f docker-compose.landing.yml logs nginx
 
 # Test de conectividad
-curl -I https://www.3910.efdiaz.xyz
+curl -I https://www.3210.efdiaz.xyz
 ```
 
 #### Gestionar servicios
@@ -118,7 +118,7 @@ docker-compose -f docker-compose.landing.yml up -d
 git pull origin JomarRama
 
 # Reconstruir y desplegar
-./scripts/deploy-landing-ssh.sh --skip-build --domain 3910.efdiaz.xyz
+./scripts/deploy-landing-ssh.sh --skip-build --domain 3210.efdiaz.xyz
 ```
 
 ### 🔄 Automatización con Systemd
@@ -176,8 +176,8 @@ cd /opt/twolifecar && ./docker/ssl/renew-ssl.sh
 #### Verificar DNS
 ```bash
 # Verificar que el dominio apunta al servidor
-nslookup 3910.efdiaz.xyz
-dig 3910.efdiaz.xyz
+nslookup 3210.efdiaz.xyz
+dig 3210.efdiaz.xyz
 
 # Debe devolver la IP de tu servidor
 ```
@@ -225,7 +225,7 @@ journalctl -xe
 # Crear script de health check
 cat > /opt/twolifecar/health-monitor.sh << 'EOF'
 #!/bin/bash
-URL="https://www.3910.efdiaz.xyz"
+URL="https://www.3210.efdiaz.xyz"
 if ! curl -f -s $URL > /dev/null; then
     echo "$(date): Landing Page no accesible - Reiniciando servicios"
     cd /opt/twolifecar
@@ -249,13 +249,13 @@ ssh root@mi-servidor.com
 curl -fsSL https://raw.githubusercontent.com/Jomaruwu03/TwoLifeCar/JomarRama/scripts/server-setup.sh | bash
 
 # 3. Verificar que funciona
-curl -I https://www.3910.efdiaz.xyz
+curl -I https://www.3210.efdiaz.xyz
 
 # 4. Ver logs si es necesario
 cd /opt/twolifecar
 docker-compose -f docker-compose.landing.yml logs -f
 
-# ¡Listo! Landing funcionando en https://www.3910.efdiaz.xyz
+# ¡Listo! Landing funcionando en https://www.3210.efdiaz.xyz
 ```
 
 ---

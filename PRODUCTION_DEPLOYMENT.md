@@ -1,11 +1,11 @@
 # 🚀 TwoLifeCar - Despliegue a Producción
 
-## Configuración para https://www.3910.efdiaz.xyz
+## Configuración para https://www.3210.efdiaz.xyz
 
 ### 📋 Prerequisitos
 
 1. **Servidor con Docker** instalado y funcionando
-2. **Dominio configurado**: `3910.efdiaz.xyz` debe apuntar a tu servidor IP
+2. **Dominio configurado**: `3210.efdiaz.xyz` debe apuntar a tu servidor IP
 3. **Puertos abiertos**: 80 (HTTP) y 443 (HTTPS)
 4. **Firewall configurado** para permitir tráfico web
 
@@ -38,7 +38,7 @@ Copy-Item .env.production .env
 .\scripts\setup-ssl.ps1
 
 # Método manual
-docker run --rm -it -v "$PWD\docker\ssl:/etc/letsencrypt" -p 80:80 certbot/certbot certonly --standalone --email admin@3910.efdiaz.xyz --agree-tos -d 3910.efdiaz.xyz -d www.3910.efdiaz.xyz
+docker run --rm -it -v "$PWD\docker\ssl:/etc/letsencrypt" -p 80:80 certbot/certbot certonly --standalone --email admin@3210.efdiaz.xyz --agree-tos -d 3210.efdiaz.xyz -d www.3210.efdiaz.xyz
 ```
 
 #### 3. Levantar Servicios
@@ -52,10 +52,10 @@ docker-compose up -d
 
 | Servicio | URL | Descripción |
 |----------|-----|-------------|
-| **Landing** | https://www.3910.efdiaz.xyz | Página principal |
-| **Dashboard** | https://www.3910.efdiaz.xyz/dashboard | Panel de administración |
-| **API** | https://www.3910.efdiaz.xyz/api/ | API REST |
-| **Health** | https://www.3910.efdiaz.xyz/health | Estado de servicios |
+| **Landing** | https://www.3210.efdiaz.xyz | Página principal |
+| **Dashboard** | https://www.3210.efdiaz.xyz/dashboard | Panel de administración |
+| **API** | https://www.3210.efdiaz.xyz/api/ | API REST |
+| **Health** | https://www.3210.efdiaz.xyz/health | Estado de servicios |
 
 ### 🏗️ Arquitectura de Producción
 
@@ -98,7 +98,7 @@ docker-compose logs -f
 .\health-check.ps1
 
 # Verificar SSL
-curl -I https://www.3910.efdiaz.xyz
+curl -I https://www.3210.efdiaz.xyz
 ```
 
 ### 🔄 Mantenimiento
@@ -144,7 +144,7 @@ docker-compose exec mongo mongodump --db twolifecar_prod --out /backup
 #### Problema: DNS no resuelve
 ```powershell
 # Verificar DNS
-nslookup 3910.efdiaz.xyz
+nslookup 3210.efdiaz.xyz
 # Debe devolver la IP de tu servidor
 ```
 
@@ -155,7 +155,7 @@ netstat -an | findstr ":80"
 # Puerto 80 debe estar libre
 
 # Verificar conectividad
-Test-NetConnection 3910.efdiaz.xyz -Port 80
+Test-NetConnection 3210.efdiaz.xyz -Port 80
 ```
 
 #### Problema: Servicios no inician
@@ -186,4 +186,4 @@ Si encuentras problemas:
 
 ---
 
-**🎉 ¡Tu aplicación TwoLifeCar está lista para producción en https://www.3910.efdiaz.xyz!**
+**🎉 ¡Tu aplicación TwoLifeCar está lista para producción en https://www.3210.efdiaz.xyz!**

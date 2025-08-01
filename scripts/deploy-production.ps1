@@ -10,7 +10,7 @@ param(
     [switch]$SkipBuild = $false,
     
     [Parameter(Mandatory=$false)]
-    [string]$Domain = "3910.efdiaz.xyz"
+    [string]$Domain = "3210.efdiaz.xyz"
 )
 
 $ErrorActionPreference = "Stop"

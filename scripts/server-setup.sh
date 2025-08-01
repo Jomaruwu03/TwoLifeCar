@@ -7,7 +7,7 @@
 set -e
 
 # Configuración
-DOMAIN="3910.efdiaz.xyz"
+DOMAIN="3210.efdiaz.xyz"
 REPO_URL="https://github.com/Jomaruwu03/TwoLifeCar.git"
 BRANCH="JomarRama"
 INSTALL_DIR="/opt/twolifecar"

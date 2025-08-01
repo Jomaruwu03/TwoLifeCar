@@ -2,10 +2,10 @@
 # TwoLifeCar - Configuración de Producción SSL
 # =====================================================
 
-## 🔐 Configuración SSL para https://www.3910.efdiaz.xyz
+## 🔐 Configuración SSL para https://www.3210.efdiaz.xyz
 
 ### Prerrequisitos
-1. **Dominio configurado**: `3910.efdiaz.xyz` debe apuntar a tu servidor
+1. **Dominio configurado**: `3210.efdiaz.xyz` debe apuntar a tu servidor
 2. **Puertos abiertos**: 80 (HTTP) y 443 (HTTPS) en tu servidor/firewall
 3. **Docker instalado** y corriendo
 
@@ -14,8 +14,8 @@
 #### 1. Verificar DNS
 ```bash
 # Verificar que el dominio apunta a tu servidor
-nslookup 3910.efdiaz.xyz
-ping 3910.efdiaz.xyz
+nslookup 3210.efdiaz.xyz
+ping 3210.efdiaz.xyz
 ```
 
 #### 2. Configurar SSL Automáticamente
@@ -34,25 +34,25 @@ docker run --rm -it \
     -p 80:80 \
     certbot/certbot certonly \
     --standalone \
-    --email admin@3910.efdiaz.xyz \
+    --email admin@3210.efdiaz.xyz \
     --agree-tos \
     --no-eff-email \
-    -d 3910.efdiaz.xyz \
-    -d www.3910.efdiaz.xyz
+    -d 3210.efdiaz.xyz \
+    -d www.3210.efdiaz.xyz
 
 # Paso 2: Copiar certificados
-cp docker/ssl/live/3910.efdiaz.xyz/fullchain.pem docker/ssl/
-cp docker/ssl/live/3910.efdiaz.xyz/privkey.pem docker/ssl/
+cp docker/ssl/live/3210.efdiaz.xyz/fullchain.pem docker/ssl/
+cp docker/ssl/live/3210.efdiaz.xyz/privkey.pem docker/ssl/
 
 # Paso 3: Levantar servicios
 docker-compose up -d
 ```
 
 ### 🌐 URLs de Acceso
-- **Producción**: https://www.3910.efdiaz.xyz
-- **API**: https://www.3910.efdiaz.xyz/api/
-- **Dashboard**: https://www.3910.efdiaz.xyz/dashboard
-- **Health Check**: https://www.3910.efdiaz.xyz/health
+- **Producción**: https://www.3210.efdiaz.xyz
+- **API**: https://www.3210.efdiaz.xyz/api/
+- **Dashboard**: https://www.3210.efdiaz.xyz/dashboard
+- **Health Check**: https://www.3210.efdiaz.xyz/health
 
 ### 🔄 Renovación de Certificados
 ```bash
@@ -68,7 +68,7 @@ docker/ssl/renew-ssl.sh
 #### Problema: Certificados no se generan
 ```bash
 # Verificar que el dominio apunta a tu servidor
-dig 3910.efdiaz.xyz +short
+dig 3210.efdiaz.xyz +short
 
 # Verificar que no hay otros servicios en puerto 80
 sudo netstat -tlnp | grep :80
@@ -96,10 +96,10 @@ docker-compose exec nginx ping dashboard
 ### 📊 Monitoreo de Servicios
 ```bash
 # Health check completo
-curl -f https://www.3910.efdiaz.xyz/health
+curl -f https://www.3210.efdiaz.xyz/health
 
 # Status de API
-curl -f https://www.3910.efdiaz.xyz/api/
+curl -f https://www.3210.efdiaz.xyz/api/
 
 # Logs en tiempo real
 docker-compose logs -f nginx
@@ -121,7 +121,7 @@ docker/ssl/
 ├── privkey.pem        # Clave privada
 ├── renew-ssl.sh       # Script de renovación
 └── live/              # Archivos originales de certbot
-    └── 3910.efdiaz.xyz/
+    └── 3210.efdiaz.xyz/
         ├── fullchain.pem
         ├── privkey.pem
         └── ...

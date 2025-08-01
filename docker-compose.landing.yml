@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Landing Service - Solo la página principal
+  landing:
+    build:
+      context: ./landing-twolifecar
+      dockerfile: Dockerfile
+    container_name: twolifecar-landing
+    networks:
+      - twolifecar-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # Nginx para servir solo la landing
+  nginx:
+    image: nginx:alpine
+    container_name: twolifecar-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/landing-only.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/ssl:/etc/nginx/ssl:ro
+    networks:
+      - twolifecar-network
+    depends_on:
+      - landing
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+networks:
+  twolifecar-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

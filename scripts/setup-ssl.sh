@@ -5,7 +5,7 @@
 
 set -e
 
-DOMAIN="3910.efdiaz.xyz"
+DOMAIN="3210.efdiaz.xyz"
 EMAIL="admin@${DOMAIN}"
 SSL_DIR="./docker/ssl"
 
@@ -61,7 +61,7 @@ cat > "${SSL_DIR}/renew-ssl.sh" << 'EOF'
 #!/bin/bash
 # Script de renovación automática de SSL
 
-DOMAIN="3910.efdiaz.xyz"
+DOMAIN="3210.efdiaz.xyz"
 SSL_DIR="./docker/ssl"
 
 echo "🔄 Renovando certificados SSL..."

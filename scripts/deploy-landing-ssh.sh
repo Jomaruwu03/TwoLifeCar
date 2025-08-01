@@ -1,13 +1,13 @@
 #!/bin/bash
 # =====================================================
 # TwoLifeCar - Despliegue SOLO Landing Page para SSH/Linux
-# Script para subir únicamente la landing a www.3910.efdiaz.xyz
+# Script para subir únicamente la landing a www.3210.efdiaz.xyz
 # =====================================================
 
 set -e
 
 # Configuración por defecto
-DOMAIN="3910.efdiaz.xyz"
+DOMAIN="3210.efdiaz.xyz"
 SETUP_SSL=false
 SKIP_BUILD=false
 
@@ -30,7 +30,7 @@ while [[ $# -gt 0 ]]; do
             echo "Uso: $0 [opciones]"
             echo "Opciones:"
             echo "  --ssl           Configurar SSL con Let's Encrypt"
-            echo "  --domain        Dominio a usar (default: 3910.efdiaz.xyz)"
+            echo "  --domain        Dominio a usar (default: 3210.efdiaz.xyz)"
             echo "  --skip-build    Saltar construcción de imágenes"
             echo "  -h, --help      Mostrar esta ayuda"
             exit 0
