@@ -24,9 +24,13 @@ COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
 # Copiar configuración personalizada de nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Crear usuario no-root
-RUN addgroup -g 1001 -S nginx
-RUN adduser -S nginx -u 1001
+# Establecer permisos correctos (nginx user ya existe en la imagen)
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid
 
 # Exponer puerto
 EXPOSE 80
