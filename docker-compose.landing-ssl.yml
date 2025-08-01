@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Landing Service con SSL
+  landing:
+    build:
+      context: ./landing-twolifecar
+      dockerfile: Dockerfile
+    container_name: twolifecar-landing-ssl
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # Nginx con SSL para landing
+  nginx-landing-ssl:
+    image: nginx:alpine
+    container_name: twolifecar-nginx-ssl-3210
+    ports:
+      - "80:80"     # HTTP (para redirección)
+      - "443:443"   # HTTPS
+    volumes:
+      - ./docker/nginx/landing-ssl.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/ssl:/etc/nginx/ssl:ro  # Certificados SSL
+    depends_on:
+      - landing
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
