@@ -7,25 +7,16 @@ services:
       context: ./landing-twolifecar
       dockerfile: Dockerfile
     container_name: twolifecar-landing-debug
-    networks:
-      - default
     restart: unless-stopped
 
-  # Nginx para debugging (sin SSL)
+  # Nginx para debugging (puerto 3210)
   nginx:
     image: nginx:alpine
     container_name: twolifecar-nginx-debug
     ports:
-      - "80:80"
+      - "3210:80"
     volumes:
       - ./docker/nginx/landing-debug.conf:/etc/nginx/nginx.conf:ro
-    networks:
-      - default
     depends_on:
       - landing
     restart: unless-stopped
-
-networks:
-  default:
-    external: true
-    name: bridge

@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  # Landing Service - Solo la página principal
-  landing:
+  # Dashboard Service - Solo el panel de administración
+  dashboard:
     build:
-      context: ./landing-twolifecar
+      context: ./dashboard-twolifecar
       dockerfile: Dockerfile
-    container_name: twolifecar-landing
+    container_name: twolifecar-dashboard
     networks:
       - default
     restart: unless-stopped
@@ -18,18 +18,18 @@ services:
         reservations:
           memory: 128M
 
-  # Nginx para servir solo la landing
+  # Nginx para servir solo el dashboard
   nginx:
     image: nginx:alpine
-    container_name: twolifecar-nginx
+    container_name: twolifecar-nginx-dashboard
     ports:
-      - "3210:80"
+      - "3209:80"
     volumes:
-      - ./docker/nginx/landing-debug.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/dashboard-debug.conf:/etc/nginx/nginx.conf:ro
     networks:
       - default
     depends_on:
-      - landing
+      - dashboard
     restart: unless-stopped
     deploy:
       resources:
@@ -41,5 +41,3 @@ networks:
   default:
     external: true
     name: bridge
-
-
